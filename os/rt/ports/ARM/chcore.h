@@ -206,6 +206,10 @@ struct port_extctx {
  *          switch.
  */
 struct port_intctx {
+#if defined(ARM_FPU)
+  regarm_t              fpscr;
+  regarm_t              d[64];
+#endif
   regarm_t              r4;
   regarm_t              r5;
   regarm_t              r6;
