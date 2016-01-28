@@ -14,6 +14,7 @@
 
 #include "zynq7000_gic.h"
 #include "zynq7000_prv_timer.h"
+#include "zynq7000_gpio.h"
 
 /* Peripherals */
 #define GIC_ICD_BASE 0xF8F01000U
@@ -24,6 +25,12 @@
 
 #define PRV_TIMER_BASE 0xF8F00600U
 #define PRV_TIMER ((prv_timer_t *)PRV_TIMER_BASE)
+
+#define GPIO_BASE 0xE000A000U
+#define GPIO ((gpio_t *)GPIO_BASE)
+
+#define GPIO_MIO_BASE 0xF8000700U
+#define GPIO_MIO ((gpio_mio_t *)GPIO_MIO_BASE)
 
 /* IRQ IDs */
 typedef enum {
