@@ -68,25 +68,47 @@ void gic_handler_register(irq_id_t irq_id, irq_handler_t handler,
   GIC_ICD->ICDIPTR[irq_id] |= (1 << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(CPU_ID));
 }
 
-void gic_irq_priority_set(irq_id_t irq_id, irq_priority_t irq_priority)
+void gic_irq_priority_set(irq_id_t irq_id, irq_priority_t priority)
 {
   assert(irq_id < IRQ_ID__COUNT);
 
-  GIC_ICD->ICDIPR[irq_id] = irq_priority;
+  GIC_ICD->ICDIPR[irq_id] = priority;
+}
+
+void gic_irq_sensitivity_set(irq_id_t irq_id, irq_sensitivity_t sensitivity)
+{
+  assert(irq_id < IRQ_ID__COUNT);
+
+  switch (sensitivity) {
+  case IRQ_SENSITIVITY_EDGE: {
+    GIC_ICD->ICDICR[GIC_ICD_ICDICR_EDGETRIG_Reg(irq_id)] |=
+        GIC_ICD_ICDICR_EDGETRIG_Msk(irq_id);
+  }
+  break;
+
+  case IRQ_SENSITIVITY_LEVEL: {
+    GIC_ICD->ICDICR[GIC_ICD_ICDICR_EDGETRIG_Reg(irq_id)] &=
+        ~GIC_ICD_ICDICR_EDGETRIG_Msk(irq_id);
+  }
+  break;
+
+  default:
+    assert("invalid irq sensitivity");
+  }
 }
 
 void gic_irq_enable(irq_id_t irq_id)
 {
   assert(irq_id < IRQ_ID__COUNT);
 
-  /* One bit per IRQ ID */
-  GIC_ICD->ICDISER[(irq_id / 32)] = 1 << (irq_id % 32);
+  GIC_ICD->ICDISER[GIC_ICD_ICDISER_SET_Reg(irq_id)] =
+      GIC_ICD_ICDISER_SET_Msk(irq_id);
 }
 
-void gic_irq_dinable(irq_id_t irq_id)
+void gic_irq_disable(irq_id_t irq_id)
 {
   assert(irq_id < IRQ_ID__COUNT);
 
-  /* One bit per IRQ ID */
-  GIC_ICD->ICDICER[(irq_id / 32)] = 1 << (irq_id % 32);
+  GIC_ICD->ICDICER[GIC_ICD_ICDICER_CLEAR_Reg(irq_id)] =
+      GIC_ICD_ICDICER_CLEAR_Msk(irq_id);
 }
