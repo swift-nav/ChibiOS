@@ -54,12 +54,20 @@ typedef struct {
 #define GIC_ICD_ICDDCR_ENABLE_Pos (0x0U)
 #define GIC_ICD_ICDDCR_ENABLE_Msk (0x1U << GIC_ICD_ICDDCR_ENABLE_Pos)
 
-#define GIC_ICD_ICDICR_EDGETRIG_Reg(id) ((id) / 16)
-#define GIC_ICD_ICDICR_EDGETRIG_Pos(id) ((id) % 16)
-#define GIC_ICD_ICDICR_EDGETRIG_Msk(id) (0x1U << GIC_ICD_ICDICR_EDGETRIG_Pos(n)
+#define GIC_ICD_ICDISER_SET_Reg(id) ((id) / 32U)
+#define GIC_ICD_ICDISER_SET_Pos(id) ((id) % 32U)
+#define GIC_ICD_ICDISER_SET_Msk(id) (0x1U << GIC_ICD_ICDISER_SET_Pos(id))
+
+#define GIC_ICD_ICDICER_CLEAR_Reg(id) ((id) / 32U)
+#define GIC_ICD_ICDICER_CLEAR_Pos(id) ((id) % 32U)
+#define GIC_ICD_ICDICER_CLEAR_Msk(id) (0x1U << GIC_ICD_ICDICER_CLEAR_Pos(id))
 
 #define GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu) (cpu)
 #define GIC_ICD_ICDIPTR_CPUTARGETn_Msk(cpu) (0x1U << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu))
+
+#define GIC_ICD_ICDICR_EDGETRIG_Reg(id) ((id) / 16U)
+#define GIC_ICD_ICDICR_EDGETRIG_Pos(id) (2U * ((id) % 16U) + 1U)
+#define GIC_ICD_ICDICR_EDGETRIG_Msk(id) (0x1U << GIC_ICD_ICDICR_EDGETRIG_Pos(id))
 
 #define GIC_ICC_ICCICR_ENABLES_Pos (0x0U)
 #define GIC_ICC_ICCICR_ENABLES_Msk (0x1U << GIC_ICC_ICCICR_ENABLES_Pos)

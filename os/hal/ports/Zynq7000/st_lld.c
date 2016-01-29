@@ -84,6 +84,7 @@ void st_lld_init(void) {
                        (0 << PRV_TIMER_CONTROL_PRESCALER_Pos);
 
   gic_handler_register(IRQ_ID_PRV_TIMER, prv_timer_irq_handler, 0);
+  gic_irq_sensitivity_set(IRQ_ID_PRV_TIMER, IRQ_SENSITIVITY_EDGE);
   gic_irq_priority_set(IRQ_ID_PRV_TIMER, 32);
   gic_irq_enable(IRQ_ID_PRV_TIMER);
 }
