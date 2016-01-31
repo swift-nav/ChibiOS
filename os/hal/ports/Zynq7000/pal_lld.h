@@ -27,6 +27,8 @@
 
 #if (HAL_USE_PAL == TRUE) || defined(__DOXYGEN__)
 
+#include "gpio.h"
+
 /*===========================================================================*/
 /* Unsupported modes and specific modes                                      */
 /*===========================================================================*/
@@ -170,17 +172,6 @@ typedef uint32_t ioportid_t;
 /*===========================================================================*/
 /* I/O Ports Identifiers.                                                    */
 /*===========================================================================*/
-
-/**
- *
- * @name    GPIO ports definitions
- * @{
- */
-#define GPIO0                       (0U)
-#define GPIO1                       (1U)
-#define GPIO2                       (2U)
-#define GPIO3                       (3U)
-/** @} */
 
 /**
  * @brief   Low level PAL subsystem initialization.
