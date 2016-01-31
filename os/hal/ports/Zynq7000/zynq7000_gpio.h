@@ -44,6 +44,15 @@ typedef struct {
 } gpio_mio_t;
 
 /* Bitfields */
+#define GPIO_PIN_Pos(pin) (pin)
+#define GPIO_PIN_Msk(pin) (0x1U << GPIO_PIN_Pos(pin))
+
+#define GPIO_CFG_INT_TYPE_LEVEL (0U)
+#define GPIO_CFG_INT_TYPE_EDGE (1U)
+
+#define GPIO_CFG_INT_POLARITY_LOW_FALLING (0U)
+#define GPIO_CFG_INT_POLARITY_HIGH_RISING (1U)
+
 #define GPIO_MIO_PIN_TRI_ENABLE_Pos (0x0U)
 #define GPIO_MIO_PIN_TRI_ENABLE_Msk (0x1U << GPIO_MIO_PIN_TRI_ENABLE_Pos)
 

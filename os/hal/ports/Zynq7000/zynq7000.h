@@ -35,6 +35,7 @@
 /* IRQ IDs */
 typedef enum {
   IRQ_ID_PRV_TIMER =          29,
+  IRQ_ID_GPIO =               52,
   IRQ_ID__COUNT =             94 /* Maximum number of IRQ IDs */
 } irq_id_t;
 
