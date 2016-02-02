@@ -25,5 +25,7 @@ void gic_irq_priority_set(irq_id_t irq_id, irq_priority_t priority);
 void gic_irq_sensitivity_set(irq_id_t irq_id, irq_sensitivity_t sensitivity);
 void gic_irq_enable(irq_id_t irq_id);
 void gic_irq_disable(irq_id_t irq_id);
+void gic_irq_pending_set(irq_id_t irq_id);
+void gic_irq_pending_clear(irq_id_t irq_id);
 
 #endif /* _GIC_H_ */
