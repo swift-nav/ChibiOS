@@ -31,8 +31,6 @@ void gic_init(void)
   /* Enable distributor */
   GIC_ICD->ICDDCR = (1 << GIC_ICD_ICDDCR_ENABLE_Pos);
 
-  /* TODO: initialize edge/level sensitivities */
-
   /* Clear handler table */
   memset(irq_handler_table, 0, sizeof(irq_handler_table));
 }
@@ -112,3 +110,20 @@ void gic_irq_disable(irq_id_t irq_id)
   GIC_ICD->ICDICER[GIC_ICD_ICDICER_CLEAR_Reg(irq_id)] =
       GIC_ICD_ICDICER_CLEAR_Msk(irq_id);
 }
+
+void gic_irq_pending_set(irq_id_t irq_id)
+{
+  assert(irq_id < IRQ_ID__COUNT);
+
+  GIC_ICD->ICDISPR[GIC_ICD_ICDISPR_SET_Reg(irq_id)] =
+      GIC_ICD_ICDISPR_SET_Msk(irq_id);
+}
+
+void gic_irq_pending_clear(irq_id_t irq_id)
+{
+  assert(irq_id < IRQ_ID__COUNT);
+
+  GIC_ICD->ICDICPR[GIC_ICD_ICDICPR_CLEAR_Reg(irq_id)] =
+      GIC_ICD_ICDICPR_CLEAR_Msk(irq_id);
+}
+

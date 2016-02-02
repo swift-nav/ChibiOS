@@ -75,9 +75,7 @@ static void prv_timer_irq_handler(void *context) {
  */
 void st_lld_init(void) {
 
-  /* TODO: Remove hardcoded clock frequency */
-  PRV_TIMER->LOAD = 666666687 / OSAL_ST_FREQUENCY / 2;
-
+  PRV_TIMER->LOAD = CPU_FREQUENCY_Hz / OSAL_ST_FREQUENCY / 2;
   PRV_TIMER->CONTROL = (1 << PRV_TIMER_CONTROL_ENABLE_Pos) |
                        (1 << PRV_TIMER_CONTROL_AUTORELOAD_Pos) |
                        (1 << PRV_TIMER_CONTROL_IRQENABLE_Pos) |

@@ -51,7 +51,7 @@ typedef struct {
 } gic_icc_t;
 
 /* Bitfields */
-#define GIC_ICD_ICDDCR_ENABLE_Pos (0x0U)
+#define GIC_ICD_ICDDCR_ENABLE_Pos (0U)
 #define GIC_ICD_ICDDCR_ENABLE_Msk (0x1U << GIC_ICD_ICDDCR_ENABLE_Pos)
 
 #define GIC_ICD_ICDISER_SET_Reg(id) ((id) / 32U)
@@ -62,6 +62,14 @@ typedef struct {
 #define GIC_ICD_ICDICER_CLEAR_Pos(id) ((id) % 32U)
 #define GIC_ICD_ICDICER_CLEAR_Msk(id) (0x1U << GIC_ICD_ICDICER_CLEAR_Pos(id))
 
+#define GIC_ICD_ICDISPR_SET_Reg(id) ((id) / 32U)
+#define GIC_ICD_ICDISPR_SET_Pos(id) ((id) % 32U)
+#define GIC_ICD_ICDISPR_SET_Msk(id) (0x1U << GIC_ICD_ICDISPR_SET_Pos(id))
+
+#define GIC_ICD_ICDICPR_CLEAR_Reg(id) ((id) / 32U)
+#define GIC_ICD_ICDICPR_CLEAR_Pos(id) ((id) % 32U)
+#define GIC_ICD_ICDICPR_CLEAR_Msk(id) (0x1U << GIC_ICD_ICDICPR_CLEAR_Pos(id))
+
 #define GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu) (cpu)
 #define GIC_ICD_ICDIPTR_CPUTARGETn_Msk(cpu) (0x1U << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu))
 
@@ -69,16 +77,16 @@ typedef struct {
 #define GIC_ICD_ICDICR_EDGETRIG_Pos(id) (2U * ((id) % 16U) + 1U)
 #define GIC_ICD_ICDICR_EDGETRIG_Msk(id) (0x1U << GIC_ICD_ICDICR_EDGETRIG_Pos(id))
 
-#define GIC_ICC_ICCICR_ENABLES_Pos (0x0U)
+#define GIC_ICC_ICCICR_ENABLES_Pos (0U)
 #define GIC_ICC_ICCICR_ENABLES_Msk (0x1U << GIC_ICC_ICCICR_ENABLES_Pos)
 
-#define GIC_ICC_ICCICR_ENABLENS_Pos (0x1U)
+#define GIC_ICC_ICCICR_ENABLENS_Pos (1U)
 #define GIC_ICC_ICCICR_ENABLENS_Msk (0x1U << GIC_ICC_ICCICR_ENABLENS_Pos)
 
-#define GIC_ICC_ICCICR_ACKCTL_Pos (0x2U)
+#define GIC_ICC_ICCICR_ACKCTL_Pos (2U)
 #define GIC_ICC_ICCICR_ACKCTL_Msk (0x1U << GIC_ICC_ICCICR_ACKCTL_Pos)
 
-#define GIC_ICC_ICCIAR_ACKINTID_Pos (0x0U)
+#define GIC_ICC_ICCIAR_ACKINTID_Pos (0U)
 #define GIC_ICC_ICCIAR_ACKINTID_Msk (0x3FF << GIC_ICC_ICCIAR_ACKINTID_Pos)
 
 #endif /* _ZYNQ7000_GIC_H_ */
