@@ -45,6 +45,7 @@
 /* Direction */
 #define PAL_DIR_INPUT                 (0U)
 #define PAL_DIR_OUTPUT                (1U << 16U)
+#define PAL_DIR_PERICTRL              (PAL_DIR_OUTPUT)
 
 /* Pull */
 #define PAL_PULL_NONE                 (0U)
