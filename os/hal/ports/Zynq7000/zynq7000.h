@@ -16,6 +16,7 @@
 #include "zynq7000_prv_timer.h"
 #include "zynq7000_gpio.h"
 #include "zynq7000_uart.h"
+#include "zynq7000_spi.h"
 
 /* Peripherals */
 #define GIC_ICD_BASE 0xF8F01000U
@@ -39,11 +40,19 @@
 #define UART1_BASE 0xE0001000U
 #define UART1 ((uart_t *)UART1_BASE)
 
+#define SPI0_BASE 0xE0006000U
+#define SPI0 ((spi_t *)SPI0_BASE)
+
+#define SPI1_BASE 0xE0007000U
+#define SPI1 ((spi_t *)SPI1_BASE)
+
 /* IRQ IDs */
 typedef enum {
   IRQ_ID_PRV_TIMER =          29,
   IRQ_ID_GPIO =               52,
+  IRQ_ID_SPI0 =               58,
   IRQ_ID_UART0 =              59,
+  IRQ_ID_SPI1 =               81,
   IRQ_ID_UART1 =              82,
   IRQ_ID__COUNT =             94 /* Maximum number of IRQ IDs */
 } irq_id_t;
