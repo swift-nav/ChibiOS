@@ -75,20 +75,22 @@ void _pal_lld_setgroupmode(ioportid_t port,
                            ioportmask_t mask,
                            iomode_t mode) {
 
+  uint32_t function = (mode & 0xffff);
   bool output = (mode & PAL_DIR_OUTPUT);
   bool pullup = (mode & PAL_PULL_UP);
   bool fast = (mode & PAL_SPEED_FAST);
-  bool function = (mode & 0xffff);
   bool mio = (port == GPIO0) || (port == GPIO1);
 
-  if (output) {
-    /* Set DIRM and OEN bits */
-    GPIO->CFG[port].DIRM |= mask;
-    GPIO->CFG[port].OEN |= mask;
-  } else {
-    /* Clear DIRM and OEN bits */
-    GPIO->CFG[port].DIRM &= ~mask;
-    GPIO->CFG[port].OEN &= ~mask;
+  if (function == PAL_PIN_FUNCTION_GPIO) {
+    if (output) {
+      /* Set DIRM and OEN bits */
+      GPIO->CFG[port].DIRM |= mask;
+      GPIO->CFG[port].OEN |= mask;
+    } else {
+      /* Clear DIRM and OEN bits */
+      GPIO->CFG[port].DIRM &= ~mask;
+      GPIO->CFG[port].OEN &= ~mask;
+    }
   }
 
   uint32_t clear_mask = (GPIO_MIO_PIN_PULLUP_Msk |
