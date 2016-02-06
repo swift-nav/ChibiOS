@@ -14,6 +14,7 @@
 
 #include "zynq7000_gic.h"
 #include "zynq7000_prv_timer.h"
+#include "zynq7000_prv_wdt.h"
 #include "zynq7000_gpio.h"
 #include "zynq7000_uart.h"
 #include "zynq7000_spi.h"
@@ -27,6 +28,9 @@
 
 #define PRV_TIMER_BASE 0xF8F00600U
 #define PRV_TIMER ((prv_timer_t *)PRV_TIMER_BASE)
+
+#define PRV_WDT_BASE 0xF8F00620U
+#define PRV_WDT ((prv_wdt_t *)PRV_WDT_BASE)
 
 #define GPIO_BASE 0xE000A000U
 #define GPIO ((gpio_t *)GPIO_BASE)
