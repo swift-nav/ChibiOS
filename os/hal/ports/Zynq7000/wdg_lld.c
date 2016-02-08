@@ -52,7 +52,7 @@ WDGDriver WDGD1;
 
 void period_calc(uint32_t period_ms, uint8_t *r_prescaler, uint32_t *r_load) {
 
-  uint32_t wdg_clk_freq_khz = DIV_CEIL_UNSIGNED(CPU_FREQUENCY_Hz, 2*1000);
+  uint32_t wdg_clk_freq_khz = DIV_CEIL_UNSIGNED(CPU_3x2x_FREQUENCY_Hz, 1000);
 
   /* Maximum prescaled frequency to avoid overflow in load value calculation */
   uint32_t prescaled_freq_khz_max = UINT32_MAX / period_ms;

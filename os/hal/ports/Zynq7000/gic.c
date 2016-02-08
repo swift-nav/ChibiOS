@@ -6,10 +6,13 @@
  */
 
 #include "gic.h"
-#include <assert.h>
+
 #include <string.h>
+#include "hal.h"
 
 #define CPU_ID 0 /* TODO: fix this */
+
+#define IRQ_ID_CHECK(id) osalDbgAssert(id < IRQ_ID__COUNT, "invalid IRQ ID")
 
 typedef struct {
   irq_handler_t handler;
@@ -56,7 +59,7 @@ void gic_handle_irq(void)
 void gic_handler_register(irq_id_t irq_id, irq_handler_t handler,
                           void *context)
 {
-  assert(irq_id < IRQ_ID__COUNT);
+  IRQ_ID_CHECK(irq_id);
 
   /* Add to table */
   irq_handler_table[irq_id].handler = handler;
@@ -68,14 +71,14 @@ void gic_handler_register(irq_id_t irq_id, irq_handler_t handler,
 
 void gic_irq_priority_set(irq_id_t irq_id, irq_priority_t priority)
 {
-  assert(irq_id < IRQ_ID__COUNT);
+  IRQ_ID_CHECK(irq_id);
 
   GIC_ICD->ICDIPR[irq_id] = priority;
 }
 
 void gic_irq_sensitivity_set(irq_id_t irq_id, irq_sensitivity_t sensitivity)
 {
-  assert(irq_id < IRQ_ID__COUNT);
+  IRQ_ID_CHECK(irq_id);
 
   switch (sensitivity) {
   case IRQ_SENSITIVITY_EDGE: {
@@ -91,13 +94,13 @@ void gic_irq_sensitivity_set(irq_id_t irq_id, irq_sensitivity_t sensitivity)
   break;
 
   default:
-    assert("invalid irq sensitivity");
+    osalDbgAssert(0, "invalid irq sensitivity");
   }
 }
 
 void gic_irq_enable(irq_id_t irq_id)
 {
-  assert(irq_id < IRQ_ID__COUNT);
+  IRQ_ID_CHECK(irq_id);
 
   GIC_ICD->ICDISER[GIC_ICD_ICDISER_SET_Reg(irq_id)] =
       GIC_ICD_ICDISER_SET_Msk(irq_id);
@@ -105,7 +108,7 @@ void gic_irq_enable(irq_id_t irq_id)
 
 void gic_irq_disable(irq_id_t irq_id)
 {
-  assert(irq_id < IRQ_ID__COUNT);
+  IRQ_ID_CHECK(irq_id);
 
   GIC_ICD->ICDICER[GIC_ICD_ICDICER_CLEAR_Reg(irq_id)] =
       GIC_ICD_ICDICER_CLEAR_Msk(irq_id);
@@ -113,7 +116,7 @@ void gic_irq_disable(irq_id_t irq_id)
 
 void gic_irq_pending_set(irq_id_t irq_id)
 {
-  assert(irq_id < IRQ_ID__COUNT);
+  IRQ_ID_CHECK(irq_id);
 
   GIC_ICD->ICDISPR[GIC_ICD_ICDISPR_SET_Reg(irq_id)] =
       GIC_ICD_ICDISPR_SET_Msk(irq_id);
@@ -121,7 +124,7 @@ void gic_irq_pending_set(irq_id_t irq_id)
 
 void gic_irq_pending_clear(irq_id_t irq_id)
 {
-  assert(irq_id < IRQ_ID__COUNT);
+  IRQ_ID_CHECK(irq_id);
 
   GIC_ICD->ICDICPR[GIC_ICD_ICDICPR_CLEAR_Reg(irq_id)] =
       GIC_ICD_ICDICPR_CLEAR_Msk(irq_id);
