@@ -23,7 +23,6 @@
  */
 
 #include "hal.h"
-#include "osal.h"
 
 #include "zynq7000.h"
 #include "gic.h"

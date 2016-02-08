@@ -24,7 +24,6 @@
 
 #include "hal.h"
 
-#include <assert.h>
 #include "zynq7000.h"
 #include "gic.h"
 
@@ -87,7 +86,7 @@ static uint32_t bauddiv_get(uint8_t clkdiv) {
   case SPI_CLK_DIV_256:
     return SPI_CR_BAUDDIV_256;
   default:
-    assert("invalid clkdiv");
+    osalDbgAssert(0, "invalid clkdiv");
     return SPI_CR_BAUDDIV_256;
   }
 }
@@ -221,8 +220,8 @@ static void spi_irq_handler(void *context) {
 
     /* Clean up if finished */
     if (final_rx) {
-      assert(spip->rxidx == spip->count);
-      assert(spip->txidx == spip->count);
+      osalDbgAssert(spip->rxidx == spip->count, "invalid rxidx");
+      osalDbgAssert(spip->txidx == spip->count, "invalid txidx");
 
       /* Disable RXTRIG interrupt */
       spi->IDR = SPI_INT_RXTRIG_Msk;
