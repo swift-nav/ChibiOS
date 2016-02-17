@@ -67,6 +67,23 @@ void hal_lld_init(void) {
   gic_init();
 }
 
+/**
+ * @brief   Returns the ID of the currently executing CPU
+ *
+ * @notapi
+ */
+uint8_t hal_lld_cpu_id_get(void) {
+
+  uint8_t cpu_id;
+  asm volatile (
+      "mrc p15, 0, %0, c0, c0, 5"
+      : "=r" (cpu_id)
+      :
+      :
+  );
+  return cpu_id;
+}
+
 /* Early init hook */
 void __early_init(void) {
 

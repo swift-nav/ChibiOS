@@ -63,6 +63,7 @@
 extern "C" {
 #endif
   void hal_lld_init(void);
+  uint8_t hal_lld_cpu_id_get(void);
 #ifdef __cplusplus
 }
 #endif
