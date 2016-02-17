@@ -10,8 +10,6 @@
 #include <string.h>
 #include "hal.h"
 
-#define CPU_ID 0 /* TODO: fix this */
-
 #define IRQ_ID_CHECK(id) osalDbgAssert(id < IRQ_ID__COUNT, "invalid IRQ ID")
 
 typedef struct {
@@ -66,7 +64,8 @@ void gic_handler_register(irq_id_t irq_id, irq_handler_t handler,
   irq_handler_table[irq_id].context = context;
 
   /* Target this CPU */
-  GIC_ICD->ICDIPTR[irq_id] |= (1 << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(CPU_ID));
+  uint8_t cpu_id = hal_lld_cpu_id_get();
+  GIC_ICD->ICDIPTR[irq_id] |= (1 << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu_id));
 }
 
 void gic_irq_priority_set(irq_id_t irq_id, irq_priority_t priority)
