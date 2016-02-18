@@ -15,16 +15,16 @@
 */
 
 /**
- * @file    templates/wdg_lld.c
- * @brief   WDG Driver subsystem low level driver source template.
+ * @file    ZYNQ7000/wdg_lld.c
+ * @brief   ZYNQ7000 WDG Driver subsystem low level driver source.
  *
  * @addtogroup WDG
  * @{
  */
 
+#include "zynq7000.h"
 #include "hal.h"
 
-#include "zynq7000.h"
 
 #if HAL_USE_WDG || defined(__DOXYGEN__)
 
@@ -38,7 +38,8 @@
 /* Driver exported variables.                                                */
 /*===========================================================================*/
 
-#if (ZYNQ7000_WDG_USE_WDG1 == TRUE) || defined(__DOXYGEN__)
+/** @brief WDG1 driver identifier.*/
+#if (ZYNQ7000_WDG_USE_PRV_WDT == TRUE) || defined(__DOXYGEN__)
 WDGDriver WDGD1;
 #endif
 
@@ -52,7 +53,8 @@ WDGDriver WDGD1;
 
 void period_calc(uint32_t period_ms, uint8_t *r_prescaler, uint32_t *r_load) {
 
-  uint32_t wdg_clk_freq_khz = DIV_CEIL_UNSIGNED(CPU_3x2x_FREQUENCY_Hz, 1000);
+  uint32_t wdg_clk_freq_khz =
+      DIV_CEIL_UNSIGNED(ZYNQ7000_CPU_3x2x_FREQUENCY_Hz, 1000);
 
   /* Maximum prescaled frequency to avoid overflow in load value calculation */
   uint32_t prescaled_freq_khz_max = UINT32_MAX / period_ms;
@@ -82,7 +84,7 @@ void period_calc(uint32_t period_ms, uint8_t *r_prescaler, uint32_t *r_load) {
  */
 void wdg_lld_init(void) {
 
-#if ZYNQ7000_WDG_USE_WDG1 == TRUE
+#if ZYNQ7000_WDG_USE_PRV_WDT == TRUE
   WDGD1.state = WDG_STOP;
 #endif
 }

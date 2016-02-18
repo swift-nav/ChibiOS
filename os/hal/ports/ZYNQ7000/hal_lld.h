@@ -15,28 +15,29 @@
 */
 
 /**
- * @file    ext_lld.h
- * @brief   PLATFORM EXT subsystem low level driver header.
+ * @file    ZYNQ7000/hal_lld.h
+ * @brief   ZYNQ7000 HAL subsystem low level driver header.
  *
- * @addtogroup EXT
+ * @addtogroup HAL
  * @{
  */
 
-#ifndef _EXT_LLD_H_
-#define _EXT_LLD_H_
-
-#if (HAL_USE_EXT == TRUE) || defined(__DOXYGEN__)
-
-#include "gpio.h"
+#ifndef _HAL_LLD_H_
+#define _HAL_LLD_H_
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
 /*===========================================================================*/
 
 /**
- * @brief   Available number of EXT channels.
+ * @brief   Defines the support for realtime counters in the HAL.
  */
-#define EXT_MAX_CHANNELS    ZYNQ7000_EXT_NUM_CHANNELS
+#define HAL_IMPLEMENTS_COUNTERS FALSE
+
+/**
+ * @brief   Platform name.
+ */
+#define PLATFORM_NAME   "ZYNQ7000"
 
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
@@ -50,68 +51,6 @@
 /* Driver data structures and types.                                         */
 /*===========================================================================*/
 
-/**
- * @brief   EXT channel identifier.
- */
-typedef uint32_t expchannel_t;
-
-/**
- * @brief   Type of an EXT generic notification callback.
- *
- * @param[in] extp      pointer to the @p EXPDriver object triggering the
- *                      callback
- */
-typedef void (*extcallback_t)(EXTDriver *extp, expchannel_t channel);
-
-/**
- * @brief   Channel configuration structure.
- */
-typedef struct {
-  /**
-   * @brief Channel mode.
-   */
-  uint32_t              mode;
-  /**
-   * @brief Channel callback.
-   */
-  extcallback_t         cb;
-  /**
-   * @brief Port.
-   */
-  uint8_t               port;
-  /**
-   * @brief Pin.
-   */
-  uint8_t               pin;
-} EXTChannelConfig;
-
-/**
- * @brief   Driver configuration structure.
- * @note    It could be empty on some architectures.
- */
-typedef struct {
-  /**
-   * @brief Channel configurations.
-   */
-  EXTChannelConfig      channels[EXT_MAX_CHANNELS];
-  /* End of the mandatory fields.*/
-} EXTConfig;
-
-/**
- * @brief   Structure representing an EXT driver.
- */
-struct EXTDriver {
-  /**
-   * @brief Driver state.
-   */
-  extstate_t                state;
-  /**
-   * @brief Current configuration data.
-   */
-  const EXTConfig           *config;
-  /* End of the mandatory fields.*/
-};
-
 /*===========================================================================*/
 /* Driver macros.                                                            */
 /*===========================================================================*/
@@ -120,24 +59,15 @@ struct EXTDriver {
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#if !defined(__DOXYGEN__)
-extern EXTDriver EXTD1;
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void ext_lld_init(void);
-  void ext_lld_start(EXTDriver *extp);
-  void ext_lld_stop(EXTDriver *extp);
-  void ext_lld_channel_enable(EXTDriver *extp, expchannel_t channel);
-  void ext_lld_channel_disable(EXTDriver *extp, expchannel_t channel);
+  void hal_lld_init(void);
+  uint8_t hal_lld_cpu_id_get(void);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* HAL_USE_EXT == TRUE */
-
-#endif /* _EXT_LLD_H_ */
+#endif /* _HAL_LLD_H_ */
 
 /** @} */

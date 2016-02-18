@@ -19,12 +19,12 @@
 
 /**
  * @file    armparams.h
- * @brief   ARM parameters for the Zynq7000.
+ * @brief   ARM parameters for the ZYNQ7000.
  *
- * @defgroup ARM_Zynq7000 Zynq7000 Specific Parameters
+ * @defgroup ARM_ZYNQ7000 ZYNQ7000 Specific Parameters
  * @ingroup ARM_SPECIFIC
  * @details This file contains the ARM specific parameters for the
- *          Zynq7000 platform.
+ *          ZYNQ7000 platform.
  * @{
  */
 

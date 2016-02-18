@@ -15,17 +15,17 @@
 */
 
 /**
- * @file    Zynq7000/st_lld.c
- * @brief   ST Driver subsystem low level driver code.
+ * @file    ZYNQ7000/st_lld.c
+ * @brief   ZYNQ7000 ST Driver subsystem low level driver code.
  *
  * @addtogroup ST
  * @{
  */
 
+#include "gic.h"
+#include "zynq7000.h"
 #include "hal.h"
 
-#include "zynq7000.h"
-#include "gic.h"
 
 #if (OSAL_ST_MODE != OSAL_ST_MODE_NONE) || defined(__DOXYGEN__)
 
@@ -75,7 +75,7 @@ static void prv_timer_irq_handler(void *context) {
  */
 void st_lld_init(void) {
 
-  PRV_TIMER->LOAD = CPU_3x2x_FREQUENCY_Hz / OSAL_ST_FREQUENCY;
+  PRV_TIMER->LOAD = ZYNQ7000_CPU_3x2x_FREQUENCY_Hz / OSAL_ST_FREQUENCY;
   PRV_TIMER->CONTROL = (1 << PRV_TIMER_CONTROL_ENABLE_Pos) |
                        (1 << PRV_TIMER_CONTROL_AUTORELOAD_Pos) |
                        (1 << PRV_TIMER_CONTROL_IRQENABLE_Pos) |
@@ -83,7 +83,7 @@ void st_lld_init(void) {
 
   gic_handler_register(IRQ_ID_PRV_TIMER, prv_timer_irq_handler, 0);
   gic_irq_sensitivity_set(IRQ_ID_PRV_TIMER, IRQ_SENSITIVITY_EDGE);
-  gic_irq_priority_set(IRQ_ID_PRV_TIMER, 32);
+  gic_irq_priority_set(IRQ_ID_PRV_TIMER, ZYNQ7000_ST_PRV_TIMER_IRQ_PRIORITY);
   gic_irq_enable(IRQ_ID_PRV_TIMER);
 }
 

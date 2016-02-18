@@ -15,17 +15,17 @@
 */
 
 /**
- * @file    ext_lld.c
- * @brief   PLATFORM EXT subsystem low level driver source.
+ * @file    ZYNQ7000/ext_lld.c
+ * @brief   ZYNQ7000 EXT subsystem low level driver source.
  *
  * @addtogroup EXT
  * @{
  */
 
+#include "gic.h"
+#include "zynq7000.h"
 #include "hal.h"
 
-#include "zynq7000.h"
-#include "gic.h"
 
 #if (HAL_USE_EXT == TRUE) || defined(__DOXYGEN__)
 
@@ -127,7 +127,7 @@ void ext_lld_init(void) {
   /* Configure interrupts */
   gic_handler_register(IRQ_ID_GPIO, gpio_irq_handler, 0);
   gic_irq_sensitivity_set(IRQ_ID_GPIO, IRQ_SENSITIVITY_LEVEL);
-  gic_irq_priority_set(IRQ_ID_GPIO, 32);
+  gic_irq_priority_set(IRQ_ID_GPIO, ZYNQ7000_EXT_GPIO_IRQ_PRIORITY);
 }
 
 /**

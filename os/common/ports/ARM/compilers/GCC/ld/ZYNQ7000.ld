@@ -18,7 +18,7 @@
 */
 
 /*
- * Zynq7000 memory setup.
+ * ZYNQ7000 memory setup.
  */
 MEMORY
 {

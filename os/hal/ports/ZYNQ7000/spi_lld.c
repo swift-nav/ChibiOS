@@ -15,17 +15,17 @@
 */
 
 /**
- * @file    spi_lld.c
- * @brief   Zynq7000 SPI subsystem low level driver source.
+ * @file    ZYNQ7000/spi_lld.c
+ * @brief   ZYNQ7000 SPI subsystem low level driver source.
  *
  * @addtogroup SPI
  * @{
  */
 
+#include "gic.h"
+#include "zynq7000.h"
 #include "hal.h"
 
-#include "zynq7000.h"
-#include "gic.h"
 
 #if (HAL_USE_SPI == TRUE) || defined(__DOXYGEN__)
 
@@ -47,16 +47,16 @@ static void spi_irq_handler(void *context);
 /*===========================================================================*/
 
 /**
- * @brief   SPI1 driver identifier.
+ * @brief   SPID1 driver identifier.
  */
-#if (ZYNQ7000_SPI_USE_SPI1 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_SPI_USE_SPI0 == TRUE) || defined(__DOXYGEN__)
 SPIDriver SPID1;
 #endif
 
 /**
- * @brief   SPI2 driver identifier.
+ * @brief   SPID2 driver identifier.
  */
-#if (ZYNQ7000_SPI_USE_SPI2 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_SPI_USE_SPI1 == TRUE) || defined(__DOXYGEN__)
 SPIDriver SPID2;
 #endif
 
@@ -91,10 +91,10 @@ static uint32_t bauddiv_get(uint8_t clkdiv) {
   }
 }
 
-static void interrupts_init(irq_id_t irq_id, SPIDriver *spip) {
-  gic_handler_register(irq_id, spi_irq_handler, spip);
-  gic_irq_sensitivity_set(irq_id, IRQ_SENSITIVITY_LEVEL);
-  gic_irq_priority_set(irq_id, 32);
+static void interrupts_init(SPIDriver *spip) {
+  gic_handler_register(spip->irq_id, spi_irq_handler, spip);
+  gic_irq_sensitivity_set(spip->irq_id, IRQ_SENSITIVITY_LEVEL);
+  gic_irq_priority_set(spip->irq_id, spip->irq_priority);
 }
 
 static void spi_start(spi_t *spi, uint8_t mode, uint8_t clkdiv) {
@@ -241,16 +241,20 @@ static void spi_irq_handler(void *context) {
  */
 void spi_lld_init(void) {
 
-#if ZYNQ7000_SPI_USE_SPI1 == TRUE
+#if ZYNQ7000_SPI_USE_SPI0 == TRUE
   spiObjectInit(&SPID1);
   SPID1.spi = SPI0;
-  interrupts_init(IRQ_ID_SPI0, &SPID1);
+  SPID1.irq_id = IRQ_ID_SPI0;
+  SPID1.irq_priority = ZYNQ7000_SPI_SPI0_IRQ_PRIORITY;
+  interrupts_init(&SPID1);
 #endif
 
-#if ZYNQ7000_SPI_USE_SPI2 == TRUE
+#if ZYNQ7000_SPI_USE_SPI1 == TRUE
   spiObjectInit(&SPID2);
   SPID2.spi = SPI1;
-  interrupts_init(IRQ_ID_SPI1, &SPID2);
+  SPID2.irq_id = IRQ_ID_SPI1;
+  SPID2.irq_priority = ZYNQ7000_SPI_SPI1_IRQ_PRIORITY;
+  interrupts_init(&SPID2);
 #endif
 }
 
@@ -264,19 +268,8 @@ void spi_lld_init(void) {
 void spi_lld_start(SPIDriver *spip) {
 
   if (spip->state == SPI_STOP) {
-#if ZYNQ7000_SPI_USE_SPI1 == TRUE
-    if (&SPID1 == spip) {
-      spi_start(spip->spi, spip->config->mode, spip->config->clkdiv);
-      gic_irq_enable(IRQ_ID_SPI0);
-    }
-#endif
-
-#if ZYNQ7000_SPI_USE_SPI2 == TRUE
-    if (&SPID2 == spip) {
-      spi_start(spip->spi, spip->config->mode, spip->config->clkdiv);
-      gic_irq_enable(IRQ_ID_SPI1);
-    }
-#endif
+    spi_start(spip->spi, spip->config->mode, spip->config->clkdiv);
+    gic_irq_enable(spip->irq_id);
   }
 }
 
@@ -290,19 +283,8 @@ void spi_lld_start(SPIDriver *spip) {
 void spi_lld_stop(SPIDriver *spip) {
 
   if (spip->state == SPI_READY) {
-#if ZYNQ7000_SPI_USE_SPI1 == TRUE
-    if (&SPID1 == spip) {
-      gic_irq_disable(IRQ_ID_SPI0);
-      spi_stop(spip->spi);
-    }
-#endif
-
-#if ZYNQ7000_SPI_USE_SPI2 == TRUE
-    if (&SPID2 == spip) {
-      gic_irq_disable(IRQ_ID_SPI1);
-      spi_stop(spip->spi);
-    }
-#endif
+    gic_irq_disable(spip->irq_id);
+    spi_stop(spip->spi);
   }
 }
 
