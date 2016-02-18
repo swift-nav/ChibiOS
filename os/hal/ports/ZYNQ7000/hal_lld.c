@@ -15,59 +15,88 @@
 */
 
 /**
- * @file    Zynq7000/hal_lld.h
- * @brief   HAL subsystem low level driver header.
+ * @file    ZYNQ7000/hal_lld.c
+ * @brief   ZYNQ7000 HAL subsystem low level driver source.
  *
  * @addtogroup HAL
  * @{
  */
 
-#ifndef _HAL_LLD_H_
-#define _HAL_LLD_H_
+#include "gic.h"
+#include "zynq7000.h"
+#include "hal.h"
+
+
+static OSAL_IRQ_HANDLER(irq_handler);
+void * const irq_handler_addr = irq_handler; /* must be externally visible */
 
 /*===========================================================================*/
-/* Driver constants.                                                         */
-/*===========================================================================*/
-
-/**
- * @brief   Defines the support for realtime counters in the HAL.
- */
-#define HAL_IMPLEMENTS_COUNTERS FALSE
-
-/**
- * @brief   Platform name.
- */
-#define PLATFORM_NAME   "Zynq7000"
-
-/*===========================================================================*/
-/* Driver pre-compile time settings.                                         */
+/* Driver exported variables.                                                */
 /*===========================================================================*/
 
 /*===========================================================================*/
-/* Derived constants and error checks.                                       */
+/* Driver local variables and types.                                         */
 /*===========================================================================*/
 
 /*===========================================================================*/
-/* Driver data structures and types.                                         */
+/* Driver local functions.                                                   */
 /*===========================================================================*/
 
 /*===========================================================================*/
-/* Driver macros.                                                            */
+/* Driver interrupt handlers.                                                */
 /*===========================================================================*/
 
-/*===========================================================================*/
-/* External declarations.                                                    */
-/*===========================================================================*/
+static OSAL_IRQ_HANDLER(irq_handler) {
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-  void hal_lld_init(void);
-  uint8_t hal_lld_cpu_id_get(void);
-#ifdef __cplusplus
+  OSAL_IRQ_PROLOGUE();
+  gic_handle_irq();
+  OSAL_IRQ_EPILOGUE();
 }
-#endif
 
-#endif /* _HAL_LLD_H_ */
+/*===========================================================================*/
+/* Driver exported functions.                                                */
+/*===========================================================================*/
+
+/**
+ * @brief   Low level HAL driver initialization.
+ *
+ * @notapi
+ */
+void hal_lld_init(void) {
+
+  gic_init();
+}
+
+/**
+ * @brief   Returns the ID of the currently executing CPU
+ *
+ * @notapi
+ */
+uint8_t hal_lld_cpu_id_get(void) {
+
+  uint8_t cpu_id;
+  asm volatile (
+      "mrc p15, 0, %0, c0, c0, 5"
+      : "=r" (cpu_id)
+      :
+      :
+  );
+  return cpu_id;
+}
+
+/* Early init hook */
+void __early_init(void) {
+
+  /* Write vector table address to VBAR */
+  extern void _start(void);
+  asm volatile (
+      "mcr p15, 0, %0, c12, c0, 0"
+      :
+      : "r" (_start)
+      :
+  );
+
+  /* TODO: Set up caches, MMU, SCU */
+}
 
 /** @} */

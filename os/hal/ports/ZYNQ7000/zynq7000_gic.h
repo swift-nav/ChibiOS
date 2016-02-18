@@ -70,6 +70,10 @@ typedef struct {
 #define GIC_ICD_ICDICPR_CLEAR_Pos(id) ((id) % 32U)
 #define GIC_ICD_ICDICPR_CLEAR_Msk(id) (0x1U << GIC_ICD_ICDICPR_CLEAR_Pos(id))
 
+#define GIC_ICD_ICDIPR_PRIORITY_Pos (3U)
+#define GIC_ICD_ICDIPR_PRIORITY_Msk (0x1FU << GIC_ICD_ICDIPR_PRIORITY_Pos)
+#define GIC_ICD_ICDIPR_PRIORITY_MAX (0x1FU)
+
 #define GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu) (cpu)
 #define GIC_ICD_ICDIPTR_CPUTARGETn_Msk(cpu) (0x1U << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu))
 

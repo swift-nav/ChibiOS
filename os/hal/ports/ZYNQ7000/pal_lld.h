@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    pal_lld.h
- * @brief   PLATFORM PAL subsystem low level driver header.
+ * @file    ZYNQ7000/pal_lld.h
+ * @brief   ZYNQ7000 PAL subsystem low level driver header.
  *
  * @addtogroup PAL
  * @{

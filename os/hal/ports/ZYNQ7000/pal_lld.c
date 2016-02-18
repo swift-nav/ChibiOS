@@ -15,16 +15,16 @@
 */
 
 /**
- * @file    pal_lld.c
- * @brief   PLATFORM PAL subsystem low level driver source.
+ * @file    ZYNQ7000/pal_lld.c
+ * @brief   ZYNQ7000 PAL subsystem low level driver source.
  *
  * @addtogroup PAL
  * @{
  */
 
+#include "zynq7000.h"
 #include "hal.h"
 
-#include "zynq7000.h"
 
 #if (HAL_USE_PAL == TRUE) || defined(__DOXYGEN__)
 

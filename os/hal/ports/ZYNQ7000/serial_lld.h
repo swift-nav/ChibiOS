@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    serial_lld.h
- * @brief   Zynq7000 serial subsystem low level driver header.
+ * @file    ZYNQ7000/serial_lld.h
+ * @brief   ZYNQ7000 serial subsystem low level driver header.
  *
  * @addtogroup SERIAL
  * @{
@@ -36,25 +36,25 @@
 /*===========================================================================*/
 
 /**
- * @name    Zynq7000 configuration options
+ * @name    Configuration options
  * @{
  */
 /**
- * @brief   USART0 driver enable switch.
- * @details If set to @p TRUE the support for USART0 is included.
+ * @brief   SD1 driver enable switch.
+ * @details If set to @p TRUE the support for SD1 is included.
  * @note    The default is @p FALSE.
  */
-#if !defined(ZYNQ7000_SERIAL_USE_USART0) || defined(__DOXYGEN__)
-#define ZYNQ7000_SERIAL_USE_USART0             TRUE
+#if !defined(ZYNQ7000_SERIAL_USE_UART0) || defined(__DOXYGEN__)
+#define ZYNQ7000_SERIAL_USE_UART0             FALSE
 #endif
 
 /**
- * @brief   USART1 driver enable switch.
- * @details If set to @p TRUE the support for USART1 is included.
+ * @brief   SD2 driver enable switch.
+ * @details If set to @p TRUE the support for SD2 is included.
  * @note    The default is @p FALSE.
  */
-#if !defined(ZYNQ7000_SERIAL_USE_USART1) || defined(__DOXYGEN__)
-#define ZYNQ7000_SERIAL_USE_USART1             TRUE
+#if !defined(ZYNQ7000_SERIAL_USE_UART1) || defined(__DOXYGEN__)
+#define ZYNQ7000_SERIAL_USE_UART1             FALSE
 #endif
 /** @} */
 
@@ -67,7 +67,7 @@
 /*===========================================================================*/
 
 /**
- * @brief   Zynq7000 Serial Driver configuration structure.
+ * @brief   ZYNQ7000 Serial Driver configuration structure.
  * @details An instance of this structure must be passed to @p sdStart()
  *          in order to configure and start a serial driver operations.
  * @note    This structure content is architecture dependent, each driver
@@ -98,7 +98,18 @@ typedef struct {
   /* Output circular buffer.*/                                              \
   uint8_t                   ob[SERIAL_BUFFERS_SIZE];                        \
   /* End of the mandatory fields.*/                                         \
-  void                      *uart;
+  /**                                                                       \
+   * @brief   Pointer to hardware UART registers.                           \
+   */                                                                       \
+  void                      *uart;                                          \
+  /**                                                                       \
+   * @brief   IRQ ID                                                        \
+   */                                                                       \
+  uint8_t                   irq_id;                                         \
+  /**                                                                       \
+   * @brief   IRQ priority                                                  \
+   */                                                                       \
+  uint8_t                   irq_priority;
 
 /*===========================================================================*/
 /* Driver macros.                                                            */
@@ -108,11 +119,11 @@ typedef struct {
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#if (ZYNQ7000_SERIAL_USE_USART0 == TRUE) && !defined(__DOXYGEN__)
+#if (ZYNQ7000_SERIAL_USE_UART0 == TRUE) && !defined(__DOXYGEN__)
 extern SerialDriver SD1;
 #endif
 
-#if (ZYNQ7000_SERIAL_USE_USART1 == TRUE) && !defined(__DOXYGEN__)
+#if (ZYNQ7000_SERIAL_USE_UART1 == TRUE) && !defined(__DOXYGEN__)
 extern SerialDriver SD2;
 #endif
 

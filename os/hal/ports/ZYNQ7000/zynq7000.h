@@ -13,12 +13,12 @@
 #include <stddef.h>
 
 #include "zynq7000_gic.h"
+#include "zynq7000_gpio.h"
 #include "zynq7000_prv_timer.h"
 #include "zynq7000_prv_wdt.h"
-#include "zynq7000_gpio.h"
-#include "zynq7000_uart.h"
 #include "zynq7000_spi.h"
 #include "zynq7000_ttc.h"
+#include "zynq7000_uart.h"
 
 /* Peripherals */
 #define GIC_ICD_BASE 0xF8F01000U
@@ -73,8 +73,5 @@ typedef enum {
   IRQ_ID_UART1 =              82,
   IRQ_ID__COUNT =             94 /* Maximum number of IRQ IDs */
 } irq_id_t;
-
-/* IRQ Priorities */
-typedef uint8_t irq_priority_t;
 
 #endif /* _ZYNQ7000_H_ */

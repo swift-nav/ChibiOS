@@ -15,17 +15,17 @@
 */
 
 /**
- * @file    serial_lld.c
- * @brief   Zynq7000 serial subsystem low level driver source.
+ * @file    ZYNQ7000/serial_lld.c
+ * @brief   ZYNQ7000 serial subsystem low level driver source.
  *
  * @addtogroup SERIAL
  * @{
  */
 
+#include "gic.h"
+#include "zynq7000.h"
 #include "hal.h"
 
-#include "zynq7000.h"
-#include "gic.h"
 
 #if (HAL_USE_SERIAL == TRUE) || defined(__DOXYGEN__)
 
@@ -53,13 +53,13 @@ static void onotify(io_queue_t *qp, uart_t *uart, irq_id_t irq_id) {
   }
 }
 
-#if (ZYNQ7000_SERIAL_USE_USART0 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_SERIAL_USE_UART0 == TRUE) || defined(__DOXYGEN__)
 static void onotify1(io_queue_t *qp) {
   onotify(qp, UART0, IRQ_ID_UART0);
 }
 #endif
 
-#if (ZYNQ7000_SERIAL_USE_USART1 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_SERIAL_USE_UART1 == TRUE) || defined(__DOXYGEN__)
 static void onotify2(io_queue_t *qp) {
   onotify(qp, UART1, IRQ_ID_UART1);
 }
@@ -69,13 +69,13 @@ static void onotify2(io_queue_t *qp) {
 /* Driver exported variables.                                                */
 /*===========================================================================*/
 
-/** @brief USART0 serial driver identifier.*/
-#if (ZYNQ7000_SERIAL_USE_USART0 == TRUE) || defined(__DOXYGEN__)
+/** @brief SD1 driver identifier.*/
+#if (ZYNQ7000_SERIAL_USE_UART0 == TRUE) || defined(__DOXYGEN__)
 SerialDriver SD1;
 #endif
 
-/** @brief USART1 serial driver identifier.*/
-#if (ZYNQ7000_SERIAL_USE_USART1 == TRUE) || defined(__DOXYGEN__)
+/** @brief SD2 driver identifier.*/
+#if (ZYNQ7000_SERIAL_USE_UART1 == TRUE) || defined(__DOXYGEN__)
 SerialDriver SD2;
 #endif
 
@@ -110,7 +110,7 @@ static void error_set(SerialDriver *sdp, uint32_t isr) {
 }
 
 static void baud_calc(uint32_t baudrate, uint32_t *rbd, uint32_t *rcd) {
-  uint32_t ref_clk = UART_REFCLK_FREQUENCY_Hz;
+  uint32_t ref_clk = ZYNQ7000_SERIAL_UART_REFCLK_FREQUENCY_Hz;
   uint32_t best_error = UINT32_MAX;
 
   uint32_t bd;
@@ -134,10 +134,10 @@ static void baud_calc(uint32_t baudrate, uint32_t *rbd, uint32_t *rcd) {
   }
 }
 
-static void interrupts_init(irq_id_t irq_id, SerialDriver *sdp) {
-  gic_handler_register(irq_id, uart_irq_handler, sdp);
-  gic_irq_sensitivity_set(irq_id, IRQ_SENSITIVITY_LEVEL);
-  gic_irq_priority_set(irq_id, 32);
+static void interrupts_init(SerialDriver *sdp) {
+  gic_handler_register(sdp->irq_id, uart_irq_handler, sdp);
+  gic_irq_sensitivity_set(sdp->irq_id, IRQ_SENSITIVITY_LEVEL);
+  gic_irq_priority_set(sdp->irq_id, sdp->irq_priority);
 }
 
 static void uart_start(uart_t *uart, uint32_t baudrate) {
@@ -245,16 +245,20 @@ static void uart_irq_handler(void *context) {
  */
 void sd_lld_init(void) {
 
-#if ZYNQ7000_SERIAL_USE_USART0 == TRUE
+#if ZYNQ7000_SERIAL_USE_UART0 == TRUE
   sdObjectInit(&SD1, NULL, onotify1);
   SD1.uart = UART0;
-  interrupts_init(IRQ_ID_UART0, &SD1);
+  SD1.irq_id = IRQ_ID_UART0;
+  SD1.irq_priority = ZYNQ7000_SERIAL_UART0_IRQ_PRIORITY;
+  interrupts_init(&SD1);
 #endif
 
-#if ZYNQ7000_SERIAL_USE_USART1 == TRUE
+#if ZYNQ7000_SERIAL_USE_UART1 == TRUE
   sdObjectInit(&SD2, NULL, onotify2);
   SD2.uart = UART1;
-  interrupts_init(IRQ_ID_UART1, &SD2);
+  SD2.irq_id = IRQ_ID_UART1;
+  SD2.irq_priority = ZYNQ7000_SERIAL_UART1_IRQ_PRIORITY;
+  interrupts_init(&SD2);
 #endif
 }
 
@@ -275,19 +279,8 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
   }
 
   if (sdp->state == SD_STOP) {
-#if ZYNQ7000_SERIAL_USE_USART0 == TRUE
-    if (&SD1 == sdp) {
-      uart_start(sdp->uart, config->speed);
-      gic_irq_enable(IRQ_ID_UART0);
-    }
-#endif
-
-#if ZYNQ7000_SERIAL_USE_USART1 == TRUE
-    if (&SD2 == sdp) {
-      uart_start(sdp->uart, config->speed);
-      gic_irq_enable(IRQ_ID_UART1);
-    }
-#endif
+    uart_start(sdp->uart, config->speed);
+    gic_irq_enable(sdp->irq_id);
   }
 }
 
@@ -303,19 +296,8 @@ void sd_lld_start(SerialDriver *sdp, const SerialConfig *config) {
 void sd_lld_stop(SerialDriver *sdp) {
 
   if (sdp->state == SD_READY) {
-#if ZYNQ7000_SERIAL_USE_USART0 == TRUE
-    if (&SD1 == sdp) {
-      gic_irq_disable(IRQ_ID_UART0);
-      uart_stop(sdp->uart);
-    }
-#endif
-
-#if ZYNQ7000_SERIAL_USE_USART1 == TRUE
-    if (&SD2 == sdp) {
-      gic_irq_disable(IRQ_ID_UART1);
-      uart_stop(sdp->uart);
-    }
-#endif
+    gic_irq_disable(sdp->irq_id);
+    uart_stop(sdp->uart);
   }
 }
 

@@ -71,8 +71,10 @@ void gic_handler_register(irq_id_t irq_id, irq_handler_t handler,
 void gic_irq_priority_set(irq_id_t irq_id, irq_priority_t priority)
 {
   IRQ_ID_CHECK(irq_id);
+  osalDbgAssert(priority <= GIC_ICD_ICDIPR_PRIORITY_MAX,
+      "invalid irq priority");
 
-  GIC_ICD->ICDIPR[irq_id] = priority;
+  GIC_ICD->ICDIPR[irq_id] = (priority << GIC_ICD_ICDIPR_PRIORITY_Pos);
 }
 
 void gic_irq_sensitivity_set(irq_id_t irq_id, irq_sensitivity_t sensitivity)

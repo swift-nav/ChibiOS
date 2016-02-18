@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    spi_lld.h
- * @brief   Zynq7000 SPI subsystem low level driver header.
+ * @file    ZYNQ7000/spi_lld.h
+ * @brief   ZYNQ7000 SPI subsystem low level driver header.
  *
  * @addtogroup SPI
  * @{
@@ -61,25 +61,25 @@
 /*===========================================================================*/
 
 /**
- * @name    Zynq7000 configuration options
+ * @name    Configuration options
  * @{
  */
 /**
- * @brief   SPI1 driver enable switch.
- * @details If set to @p TRUE the support for SPI1 is included.
+ * @brief   SPID1 driver enable switch.
+ * @details If set to @p TRUE the support for SPID1 is included.
  * @note    The default is @p FALSE.
  */
-#if !defined(ZYNQ7000_SPI_USE_SPI1) || defined(__DOXYGEN__)
-#define ZYNQ7000_SPI_USE_SPI1                  TRUE
+#if !defined(ZYNQ7000_SPI_USE_SPI0) || defined(__DOXYGEN__)
+#define ZYNQ7000_SPI_USE_SPI0                  FALSE
 #endif
 
 /**
- * @brief   SPI2 driver enable switch.
- * @details If set to @p TRUE the support for SPI1 is included.
+ * @brief   SPID2 driver enable switch.
+ * @details If set to @p TRUE the support for SPID2 is included.
  * @note    The default is @p FALSE.
  */
-#if !defined(ZYNQ7000_SPI_USE_SPI2) || defined(__DOXYGEN__)
-#define ZYNQ7000_SPI_USE_SPI2                  TRUE
+#if !defined(ZYNQ7000_SPI_USE_SPI1) || defined(__DOXYGEN__)
+#define ZYNQ7000_SPI_USE_SPI1                  FALSE
 #endif
 /** @} */
 
@@ -167,6 +167,14 @@ struct SPIDriver {
    */
   void                      *spi;
   /**
+   * @brief   IRQ ID
+   */
+  uint8_t                   irq_id;
+  /**
+   * @brief   IRQ priority
+   */
+  uint8_t                   irq_priority;
+  /**
    * @brief   Pointer to the buffer with data to send.
    */
   const uint8_t             *txbuf;
@@ -196,11 +204,11 @@ struct SPIDriver {
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#if (ZYNQ7000_SPI_USE_SPI1 == TRUE) && !defined(__DOXYGEN__)
+#if (ZYNQ7000_SPI_USE_SPI0 == TRUE) && !defined(__DOXYGEN__)
 extern SPIDriver SPID1;
 #endif
 
-#if (ZYNQ7000_SPI_USE_SPI2 == TRUE) && !defined(__DOXYGEN__)
+#if (ZYNQ7000_SPI_USE_SPI1 == TRUE) && !defined(__DOXYGEN__)
 extern SPIDriver SPID2;
 #endif
 

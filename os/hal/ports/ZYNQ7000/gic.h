@@ -10,6 +10,8 @@
 
 #include "zynq7000.h"
 
+typedef uint8_t irq_priority_t;
+
 typedef enum {
   IRQ_SENSITIVITY_EDGE,
   IRQ_SENSITIVITY_LEVEL

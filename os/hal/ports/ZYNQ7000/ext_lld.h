@@ -15,38 +15,32 @@
 */
 
 /**
- * @file    templates/wdg_lld.h
- * @brief   WDG Driver subsystem low level driver header template.
+ * @file    ZYNQ7000/ext_lld.h
+ * @brief   ZYNQ7000 EXT subsystem low level driver header.
  *
- * @addtogroup WDG
+ * @addtogroup EXT
  * @{
  */
 
-#ifndef _WDG_LLD_H_
-#define _WDG_LLD_H_
+#ifndef _EXT_LLD_H_
+#define _EXT_LLD_H_
 
-#if (HAL_USE_WDG == TRUE) || defined(__DOXYGEN__)
+#if (HAL_USE_EXT == TRUE) || defined(__DOXYGEN__)
+
+#include "gpio.h"
 
 /*===========================================================================*/
 /* Driver constants.                                                         */
 /*===========================================================================*/
 
+/**
+ * @brief   Available number of EXT channels.
+ */
+#define EXT_MAX_CHANNELS    ZYNQ7000_EXT_NUM_CHANNELS
+
 /*===========================================================================*/
 /* Driver pre-compile time settings.                                         */
 /*===========================================================================*/
-
-/**
- * @name    Configuration options
- * @{
- */
-/**
- * @brief   WDG1 driver enable switch.
- * @note    The default is @p FALSE.
- */
-#if !defined(ZYNQ7000_WDG_USE_WDG1) || defined(__DOXYGEN__)
-#define ZYNQ7000_WDG_USE_WDG1                  TRUE
-#endif
-/** @} */
 
 /*===========================================================================*/
 /* Derived constants and error checks.                                       */
@@ -57,9 +51,39 @@
 /*===========================================================================*/
 
 /**
- * @brief   Type of a structure representing an WDG driver.
+ * @brief   EXT channel identifier.
  */
-typedef struct WDGDriver WDGDriver;
+typedef uint32_t expchannel_t;
+
+/**
+ * @brief   Type of an EXT generic notification callback.
+ *
+ * @param[in] extp      pointer to the @p EXPDriver object triggering the
+ *                      callback
+ */
+typedef void (*extcallback_t)(EXTDriver *extp, expchannel_t channel);
+
+/**
+ * @brief   Channel configuration structure.
+ */
+typedef struct {
+  /**
+   * @brief Channel mode.
+   */
+  uint32_t              mode;
+  /**
+   * @brief Channel callback.
+   */
+  extcallback_t         cb;
+  /**
+   * @brief Port.
+   */
+  uint8_t               port;
+  /**
+   * @brief Pin.
+   */
+  uint8_t               pin;
+} EXTChannelConfig;
 
 /**
  * @brief   Driver configuration structure.
@@ -67,28 +91,25 @@ typedef struct WDGDriver WDGDriver;
  */
 typedef struct {
   /**
-   * @brief   Timeout period.
+   * @brief Channel configurations.
    */
-  uint32_t                  period_ms;
-} WDGConfig;
+  EXTChannelConfig      channels[EXT_MAX_CHANNELS];
+  /* End of the mandatory fields.*/
+} EXTConfig;
 
 /**
- * @brief   Structure representing an WDG driver.
+ * @brief   Structure representing an EXT driver.
  */
-struct WDGDriver {
+struct EXTDriver {
   /**
-   * @brief   Driver state.
+   * @brief Driver state.
    */
-  wdgstate_t                state;
+  extstate_t                state;
   /**
-   * @brief   Current configuration data.
+   * @brief Current configuration data.
    */
-  const WDGConfig           *config;
+  const EXTConfig           *config;
   /* End of the mandatory fields.*/
-  /**
-   * @brief   Value written to load register to restart the counter
-   */
-  uint32_t                  load;
 };
 
 /*===========================================================================*/
@@ -99,23 +120,24 @@ struct WDGDriver {
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#if (ZYNQ7000_WDG_USE_WDG1 == TRUE) && !defined(__DOXYGEN__)
-extern WDGDriver WDGD1;
+#if !defined(__DOXYGEN__)
+extern EXTDriver EXTD1;
 #endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-  void wdg_lld_init(void);
-  void wdg_lld_start(WDGDriver *wdgp);
-  void wdg_lld_stop(WDGDriver *wdgp);
-  void wdg_lld_reset(WDGDriver *wdgp);
+  void ext_lld_init(void);
+  void ext_lld_start(EXTDriver *extp);
+  void ext_lld_stop(EXTDriver *extp);
+  void ext_lld_channel_enable(EXTDriver *extp, expchannel_t channel);
+  void ext_lld_channel_disable(EXTDriver *extp, expchannel_t channel);
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* HAL_USE_WDG == TRUE */
+#endif /* HAL_USE_EXT == TRUE */
 
-#endif /* _WDG_LLD_H_ */
+#endif /* _EXT_LLD_H_ */
 
 /** @} */

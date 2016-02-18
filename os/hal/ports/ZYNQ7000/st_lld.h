@@ -15,8 +15,8 @@
 */
 
 /**
- * @file    Zynq7000/st_lld.h
- * @brief   ST Driver subsystem low level driver header.
+ * @file    ZYNQ7000/st_lld.h
+ * @brief   ZYNQ7000 ST Driver subsystem low level driver header.
  * @details This header is designed to be include-able without having to
  *          include other files from the HAL.
  *

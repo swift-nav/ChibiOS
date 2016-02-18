@@ -15,17 +15,17 @@
 */
 
 /**
- * @file    gpt_lld.c
- * @brief   Zynq7000 GPT subsystem low level driver source.
+ * @file    ZYNQ7000/gpt_lld.c
+ * @brief   ZYNQ7000 GPT subsystem low level driver source.
  *
  * @addtogroup GPT
  * @{
  */
 
+#include "gic.h"
+#include "zynq7000.h"
 #include "hal.h"
 
-#include "zynq7000.h"
-#include "gic.h"
 
 #if (HAL_USE_GPT == TRUE) || defined(__DOXYGEN__)
 
@@ -42,42 +42,42 @@ static void ttc_irq_handler(void *context);
 /**
  * @brief   GPTD1 driver identifier.
  */
-#if (ZYNQ7000_GPT_USE_GPT1 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_GPT_USE_TTC0_0 == TRUE) || defined(__DOXYGEN__)
 GPTDriver GPTD1;
 #endif
 
 /**
  * @brief   GPTD2 driver identifier.
  */
-#if (ZYNQ7000_GPT_USE_GPT2 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_GPT_USE_TTC0_1 == TRUE) || defined(__DOXYGEN__)
 GPTDriver GPTD2;
 #endif
 
 /**
  * @brief   GPTD3 driver identifier.
  */
-#if (ZYNQ7000_GPT_USE_GPT3 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_GPT_USE_TTC0_2 == TRUE) || defined(__DOXYGEN__)
 GPTDriver GPTD3;
 #endif
 
 /**
  * @brief   GPTD4 driver identifier.
  */
-#if (ZYNQ7000_GPT_USE_GPT4 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_GPT_USE_TTC1_0 == TRUE) || defined(__DOXYGEN__)
 GPTDriver GPTD4;
 #endif
 
 /**
  * @brief   GPTD5 driver identifier.
  */
-#if (ZYNQ7000_GPT_USE_GPT5 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_GPT_USE_TTC1_1 == TRUE) || defined(__DOXYGEN__)
 GPTDriver GPTD5;
 #endif
 
 /**
  * @brief   GPTD6 driver identifier.
  */
-#if (ZYNQ7000_GPT_USE_GPT6 == TRUE) || defined(__DOXYGEN__)
+#if (ZYNQ7000_GPT_USE_TTC1_2 == TRUE) || defined(__DOXYGEN__)
 GPTDriver GPTD6;
 #endif
 
@@ -92,7 +92,7 @@ GPTDriver GPTD6;
 static uint32_t prescaler_get(uint32_t frequency_hz) {
 
   uint32_t prescaler = 0;
-  uint32_t prescaled_freq_hz = CPU_1x_FREQUENCY_Hz;
+  uint32_t prescaled_freq_hz = ZYNQ7000_CPU_1x_FREQUENCY_Hz;
 
   /* Compute prescaler [0, 16] corresponding to divide by 2^N */
   while ((prescaled_freq_hz > frequency_hz) &&
@@ -108,10 +108,10 @@ static uint32_t prescaler_get(uint32_t frequency_hz) {
   return prescaler;
 }
 
-static void interrupts_init(irq_id_t irq_id, GPTDriver *gptp) {
-  gic_handler_register(irq_id, ttc_irq_handler, gptp);
-  gic_irq_sensitivity_set(irq_id, IRQ_SENSITIVITY_LEVEL);
-  gic_irq_priority_set(irq_id, 32);
+static void interrupts_init(GPTDriver *gptp) {
+  gic_handler_register(gptp->irq_id, ttc_irq_handler, gptp);
+  gic_irq_sensitivity_set(gptp->irq_id, IRQ_SENSITIVITY_LEVEL);
+  gic_irq_priority_set(gptp->irq_id, gptp->irq_priority);
 }
 
 static void timer_init(ttc_t *ttc, uint8_t tc_index) {
@@ -180,58 +180,64 @@ static void ttc_irq_handler(void *context) {
  */
 void gpt_lld_init(void) {
 
-#if ZYNQ7000_GPT_USE_GPT1 == TRUE
+#if ZYNQ7000_GPT_USE_TTC0_0 == TRUE
   gptObjectInit(&GPTD1);
-  GPTD1.irq_id = IRQ_ID_TTC0_0;
   GPTD1.ttc = TTC0;
   GPTD1.tc_index = 0;
+  GPTD1.irq_id = IRQ_ID_TTC0_0;
+  GPTD1.irq_priority = ZYNQ7000_GPT_TTC0_0_IRQ_PRIORITY;
   timer_init(GPTD1.ttc, GPTD1.tc_index);
-  interrupts_init(GPTD1.irq_id, &GPTD1);
+  interrupts_init(&GPTD1);
 #endif
 
-#if ZYNQ7000_GPT_USE_GPT2 == TRUE
+#if ZYNQ7000_GPT_USE_TTC0_1 == TRUE
   gptObjectInit(&GPTD2);
-  GPTD2.irq_id = IRQ_ID_TTC0_1;
   GPTD2.ttc = TTC0;
   GPTD2.tc_index = 1;
+  GPTD2.irq_id = IRQ_ID_TTC0_1;
+  GPTD2.irq_priority = ZYNQ7000_GPT_TTC0_1_IRQ_PRIORITY;
   timer_init(GPTD2.ttc, GPTD2.tc_index);
-  interrupts_init(GPTD2.irq_id, &GPTD2);
+  interrupts_init(&GPTD2);
 #endif
 
-#if ZYNQ7000_GPT_USE_GPT3 == TRUE
+#if ZYNQ7000_GPT_USE_TTC0_2 == TRUE
   gptObjectInit(&GPTD3);
-  GPTD3.irq_id = IRQ_ID_TTC0_2;
   GPTD3.ttc = TTC0;
   GPTD3.tc_index = 2;
+  GPTD3.irq_id = IRQ_ID_TTC0_2;
+  GPTD3.irq_priority = ZYNQ7000_GPT_TTC0_2_IRQ_PRIORITY;
   timer_init(GPTD3.ttc, GPTD3.tc_index);
-  interrupts_init(GPTD3.irq_id, &GPTD3);
+  interrupts_init(&GPTD3);
 #endif
 
-#if ZYNQ7000_GPT_USE_GPT4 == TRUE
+#if ZYNQ7000_GPT_USE_TTC1_0 == TRUE
   gptObjectInit(&GPTD4);
-  GPTD4.irq_id = IRQ_ID_TTC1_0;
   GPTD4.ttc = TTC1;
   GPTD4.tc_index = 0;
+  GPTD4.irq_id = IRQ_ID_TTC1_0;
+  GPTD4.irq_priority = ZYNQ7000_GPT_TTC1_0_IRQ_PRIORITY;
   timer_init(GPTD4.ttc, GPTD4.tc_index);
-  interrupts_init(GPTD4.irq_id, &GPTD4);
+  interrupts_init(&GPTD4);
 #endif
 
-#if ZYNQ7000_GPT_USE_GPT5 == TRUE
+#if ZYNQ7000_GPT_USE_TTC1_1 == TRUE
   gptObjectInit(&GPTD5);
-  GPTD5.irq_id = IRQ_ID_TTC1_1;
   GPTD5.ttc = TTC1;
   GPTD5.tc_index = 1;
+  GPTD5.irq_id = IRQ_ID_TTC1_1;
+  GPTD5.irq_priority = ZYNQ7000_GPT_TTC1_1_IRQ_PRIORITY;
   timer_init(GPTD5.ttc, GPTD5.tc_index);
-  interrupts_init(GPTD5.irq_id, &GPTD5);
+  interrupts_init(&GPTD5);
 #endif
 
-#if ZYNQ7000_GPT_USE_GPT6 == TRUE
+#if ZYNQ7000_GPT_USE_TTC1_2 == TRUE
   gptObjectInit(&GPTD6);
-  GPTD6.irq_id = IRQ_ID_TTC1_2;
   GPTD6.ttc = TTC1;
   GPTD6.tc_index = 2;
+  GPTD6.irq_id = IRQ_ID_TTC1_2;
+  GPTD6.irq_priority = ZYNQ7000_GPT_TTC1_2_IRQ_PRIORITY;
   timer_init(GPTD6.ttc, GPTD6.tc_index);
-  interrupts_init(GPTD6.irq_id, &GPTD6);
+  interrupts_init(&GPTD6);
 #endif
 }
 
