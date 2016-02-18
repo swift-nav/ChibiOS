@@ -51,6 +51,15 @@ WDGDriver WDGD1;
 /* Driver local functions.                                                   */
 /*===========================================================================*/
 
+/**
+ * @brief   Computes the optimal register values for the specified period.
+ *
+ * @param[in] period_ms     timeout period (ms)
+ * @param[out] r_prescaler  pointer to the output prescaler value
+ * @param[out] r_load       pointer to the output load value
+ *
+ * @notapi
+ */
 void period_calc(uint32_t period_ms, uint8_t *r_prescaler, uint32_t *r_load) {
 
   uint32_t wdg_clk_freq_khz =

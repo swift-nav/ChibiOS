@@ -52,6 +52,13 @@
 /* Driver exported functions.                                                */
 /*===========================================================================*/
 
+/**
+ * @brief   Low level PAL subsystem initialization.
+ *
+ * @param[in] config    architecture-dependent ports configuration
+ *
+ * @notapi
+ */
 void _pal_lld_init(const PALConfig *config) {
 
   (void)config;
@@ -59,18 +66,55 @@ void _pal_lld_init(const PALConfig *config) {
   /* TODO: Set initial MIO config and GPIO state */
 }
 
+/**
+ * @brief   Reads the physical I/O port states.
+ *
+ * @param[in] port      port identifier
+ * @return              The port bits.
+ *
+ * @notapi
+ */
 ioportmask_t _pal_lld_readport(ioportid_t port) {
   return GPIO->DATA_RO[port];
 }
 
+/**
+ * @brief   Reads the output latch.
+ * @details The purpose of this function is to read back the latched output
+ *          value.
+ *
+ * @param[in] port      port identifier
+ * @return              The latched logical states.
+ *
+ * @notapi
+ */
 ioportmask_t _pal_lld_readlatch(ioportid_t port) {
   return GPIO->DATA[port];
 }
 
+/**
+ * @brief   Writes a bits mask on a I/O port.
+ *
+ * @param[in] port      port identifier
+ * @param[in] bits      bits to be written on the specified port
+ *
+ * @notapi
+ */
 void _pal_lld_writeport(ioportid_t port, ioportmask_t bits) {
   GPIO->DATA[port] = bits;
 }
 
+/**
+ * @brief   Pads mode setup.
+ * @details This function programs a pads group belonging to the same port
+ *          with the specified mode.
+ *
+ * @param[in] port      the port identifier
+ * @param[in] mask      the group mask
+ * @param[in] mode      the mode
+ *
+ * @notapi
+ */
 void _pal_lld_setgroupmode(ioportid_t port,
                            ioportmask_t mask,
                            iomode_t mode) {
