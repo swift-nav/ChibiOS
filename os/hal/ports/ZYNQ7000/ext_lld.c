@@ -50,6 +50,14 @@ EXTDriver EXTD1;
 /* Driver local functions.                                                   */
 /*===========================================================================*/
 
+/**
+ * @brief   Executes the callback for an EXT event.
+ *
+ * @param[in] port      GPIO port
+ * @param[in] port      GPIO pin
+ *
+ * @notapi
+ */
 static void execute_callback(uint32_t port, uint32_t pin) {
 
   uint32_t channel;
@@ -74,6 +82,15 @@ static void execute_callback(uint32_t port, uint32_t pin) {
 /* Driver interrupt handlers.                                                */
 /*===========================================================================*/
 
+/**
+ * @brief   Handles the GPIO IRQ.
+ * @details Checks all GPIO ports for pins on which an event has occurred
+ *          and is not masked. Executes callback functions where required.
+ *
+ * @param[in] context     IRQ context
+ *
+ * @notapi
+ */
 static void gpio_irq_handler(void *context) {
 
   (void)context;

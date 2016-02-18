@@ -89,6 +89,18 @@ GPTDriver GPTD6;
 /* Driver local functions.                                                   */
 /*===========================================================================*/
 
+/**
+ * @brief   Computes the prescaler required to achieve the specified frequency.
+ * @note    This function asserts that the target frequency equals
+ *          ZYNQ7000_CPU_1x_FREQUENCY_Hz / 2^N.
+ *
+ *
+ * @param[in] frequency_hz    target frequency (Hz)
+ * @return                    the computed prescaler value [0, 16],
+ *                            corresponding to divide by 2^N
+ *
+ * @notapi
+ */
 static uint32_t prescaler_get(uint32_t frequency_hz) {
 
   uint32_t prescaler = 0;
@@ -108,12 +120,27 @@ static uint32_t prescaler_get(uint32_t frequency_hz) {
   return prescaler;
 }
 
+/**
+ * @brief   Initializes interrupts for the GPT peripheral.
+ *
+ * @param[in] gptp      pointer to the @p GPTDriver object
+ *
+ * @notapi
+ */
 static void interrupts_init(GPTDriver *gptp) {
   gic_handler_register(gptp->irq_id, ttc_irq_handler, gptp);
   gic_irq_sensitivity_set(gptp->irq_id, IRQ_SENSITIVITY_LEVEL);
   gic_irq_priority_set(gptp->irq_id, gptp->irq_priority);
 }
 
+/**
+ * @brief   Initializes a timer/counter within the TTC module.
+ *
+ * @param[in] ttc       pointer to the hardware TTC registers
+ * @param[in] tc_index  index of the timer/counter within the TTC module
+ *
+ * @notapi
+ */
 static void timer_init(ttc_t *ttc, uint8_t tc_index) {
 
   /* Disable counter */
@@ -124,6 +151,15 @@ static void timer_init(ttc_t *ttc, uint8_t tc_index) {
   ttc->ISR[tc_index];
 }
 
+/**
+ * @brief   Configures a timer/counter within the TTC module.
+ *
+ * @param[in] ttc           pointer to the hardware TTC registers
+ * @param[in] tc_index      index of the timer/counter within the TTC module
+ * @param[in] frequency_hz  timer frequency (Hz)
+ *
+ * @notapi
+ */
 static void timer_configure(ttc_t *ttc, uint8_t tc_index,
                             uint32_t frequency_hz) {
 
@@ -138,6 +174,14 @@ static void timer_configure(ttc_t *ttc, uint8_t tc_index,
   ttc->IEN[tc_index] = (1 << TTC_INT_INTERVAL_Pos);
 }
 
+/**
+ * @brief   Disables a timer/counter within the TTC module.
+ *
+ * @param[in] ttc       pointer to the hardware TTC registers
+ * @param[in] tc_index  index of the timer/counter within the TTC module
+ *
+ * @notapi
+ */
 static void timer_disable(ttc_t *ttc, uint8_t tc_index) {
 
   /* Disable counter */
@@ -152,6 +196,13 @@ static void timer_disable(ttc_t *ttc, uint8_t tc_index) {
 /* Driver interrupt handlers.                                                */
 /*===========================================================================*/
 
+/**
+ * @brief   Handles a TTC IRQ.
+ *
+ * @param[in] context     IRQ context, pointer to the @p GPTDriver object
+ *
+ * @notapi
+ */
 static void ttc_irq_handler(void *context) {
 
   GPTDriver *gptp = (GPTDriver *)context;

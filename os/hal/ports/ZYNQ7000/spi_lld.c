@@ -68,6 +68,15 @@ SPIDriver SPID2;
 /* Driver local functions.                                                   */
 /*===========================================================================*/
 
+/**
+ * @brief   Converts a SPI_CLK_DIV_XX setting to the corresponding hardware
+ *          CR_BAUDDIV register value.
+ *
+ * @param[in] clkdiv      SPI_CLK_DIV_XX setting
+ * @return                corresponding CR_BAUDDIV register value
+ *
+ * @notapi
+ */
 static uint32_t bauddiv_get(uint8_t clkdiv) {
 
   switch(clkdiv) {
@@ -91,12 +100,28 @@ static uint32_t bauddiv_get(uint8_t clkdiv) {
   }
 }
 
+/**
+ * @brief   Initializes interrupts for the SPI peripheral.
+ *
+ * @param[in] spip      pointer to the @p SPIDriver object
+ *
+ * @notapi
+ */
 static void interrupts_init(SPIDriver *spip) {
   gic_handler_register(spip->irq_id, spi_irq_handler, spip);
   gic_irq_sensitivity_set(spip->irq_id, IRQ_SENSITIVITY_LEVEL);
   gic_irq_priority_set(spip->irq_id, spip->irq_priority);
 }
 
+/**
+ * @brief   Starts the SPI peripheral.
+ *
+ * @param[in] spi       pointer to the hardware SPI registers
+ * @param[in] mode      desired SPI mode
+ * @param[in] clkdiv    desired clock divider
+ *
+ * @notapi
+ */
 static void spi_start(spi_t *spi, uint8_t mode, uint8_t clkdiv) {
 
   /* Disable SPI */
@@ -125,12 +150,28 @@ static void spi_start(spi_t *spi, uint8_t mode, uint8_t clkdiv) {
   }
 }
 
+/**
+ * @brief   Stops the SPI peripheral.
+ *
+ * @param[in] spi       pointer to the hardware SPI registers
+ *
+ * @notapi
+ */
 static void spi_stop(spi_t *spi) {
 
   /* Disable SPI */
   spi->ER = 0;
 }
 
+/**
+ * @brief   Begins an asynchronous SPI transaction.
+ * @note    txbuf, txidx, rxbuf, rxidx, and count must be initialized
+ *          prior to calling this function.
+ *
+ * @param[in] spip      pointer to the @p SPIDriver object
+ *
+ * @notapi
+ */
 static void txn_begin(SPIDriver *spip) {
 
   spi_t *spi = (spi_t *)spip->spi;
@@ -165,6 +206,15 @@ static void txn_begin(SPIDriver *spip) {
 /* Driver interrupt handlers.                                                */
 /*===========================================================================*/
 
+/**
+ * @brief   Handles a SPI IRQ.
+ * @details Reads bytes from the RX FIFO and writes bytes to the TX FIFO
+ *          until the current transaction is completed.
+ *
+ * @param[in] context     IRQ context, pointer to the @p SPIDriver object
+ *
+ * @notapi
+ */
 static void spi_irq_handler(void *context) {
 
   SPIDriver *spip = (SPIDriver *)context;

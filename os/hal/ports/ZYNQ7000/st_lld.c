@@ -53,6 +53,13 @@
 /* Driver interrupt handlers.                                                */
 /*===========================================================================*/
 
+/**
+ * @brief   Handles the private timer IRQ. Calls the OS tick handler.
+ *
+ * @param[in] context     IRQ context
+ *
+ * @notapi
+ */
 static void prv_timer_irq_handler(void *context) {
 
   (void)context;

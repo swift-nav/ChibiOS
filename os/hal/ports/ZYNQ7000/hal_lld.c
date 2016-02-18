@@ -46,6 +46,11 @@ void * const irq_handler_addr = irq_handler; /* must be externally visible */
 /* Driver interrupt handlers.                                                */
 /*===========================================================================*/
 
+/**
+ * @brief   Top-level IRQ handler.
+ *
+ * @notapi
+ */
 static OSAL_IRQ_HANDLER(irq_handler) {
 
   OSAL_IRQ_PROLOGUE();

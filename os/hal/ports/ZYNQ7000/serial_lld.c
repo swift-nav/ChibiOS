@@ -94,6 +94,14 @@ static const SerialConfig default_config = {
 /* Driver local functions.                                                   */
 /*===========================================================================*/
 
+/**
+ * @brief   Sets the error flags for a serial driver
+ *
+ * @param[in] sdp       pointer to a @p SerialDriver object
+ * @param[in] isr       value of the UART ISR register
+ *
+ * @notapi
+ */
 static void error_set(SerialDriver *sdp, uint32_t isr) {
   eventflags_t sts = 0;
 
@@ -109,6 +117,15 @@ static void error_set(SerialDriver *sdp, uint32_t isr) {
   osalSysUnlockFromISR();
 }
 
+/**
+ * @brief   Computes the optimal dividers to achieve the specified baud rate.
+ *
+ * @param[in] baudrate      target baud rate (Hz)
+ * @param[out] rbd          pointer to the output BD value
+ * @param[out] rcd          pointer to the output CD value
+ *
+ * @notapi
+ */
 static void baud_calc(uint32_t baudrate, uint32_t *rbd, uint32_t *rcd) {
   uint32_t ref_clk = ZYNQ7000_SERIAL_UART_REFCLK_FREQUENCY_Hz;
   uint32_t best_error = UINT32_MAX;
@@ -134,12 +151,27 @@ static void baud_calc(uint32_t baudrate, uint32_t *rbd, uint32_t *rcd) {
   }
 }
 
+/**
+ * @brief   Initializes interrupts for the UART peripheral.
+ *
+ * @param[in] sdp       pointer to a @p SerialDriver object
+ *
+ * @notapi
+ */
 static void interrupts_init(SerialDriver *sdp) {
   gic_handler_register(sdp->irq_id, uart_irq_handler, sdp);
   gic_irq_sensitivity_set(sdp->irq_id, IRQ_SENSITIVITY_LEVEL);
   gic_irq_priority_set(sdp->irq_id, sdp->irq_priority);
 }
 
+/**
+ * @brief   Starts the UART peripheral.
+ *
+ * @param[in] uart          pointer to the hardware UART registers
+ * @param[in] baudrate      desired baud rate (Hz)
+ *
+ * @notapi
+ */
 static void uart_start(uart_t *uart, uint32_t baudrate) {
 
   /* Disable RX and TX paths */
@@ -180,6 +212,13 @@ static void uart_start(uart_t *uart, uint32_t baudrate) {
               UART_INT_TXEMPTY_Msk;
 }
 
+/**
+ * @brief   Stops the UART peripheral.
+ *
+ * @param[in] uart          pointer to the hardware UART registers
+ *
+ * @notapi
+ */
 static void uart_stop(uart_t *uart) {
 
   /* Disable RX and TX paths */
@@ -190,6 +229,13 @@ static void uart_stop(uart_t *uart) {
 /* Driver interrupt handlers.                                                */
 /*===========================================================================*/
 
+/**
+ * @brief   Handles a UART IRQ.
+ *
+ * @param[in] context     IRQ context, pointer to a @p SerialDriver object
+ *
+ * @notapi
+ */
 static void uart_irq_handler(void *context) {
 
   SerialDriver *sdp = (SerialDriver *)context;

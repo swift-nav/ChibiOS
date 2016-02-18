@@ -1,8 +1,25 @@
 /*
- * gic.c
+    ChibiOS - Copyright (C) 2006..2015 Giovanni Di Sirio
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+*/
+
+/**
+ * @file    ZYNQ7000/gic.c
+ * @brief   ZYNQ7000 GIC peripheral support code.
  *
- *  Created on: Jan 24, 2016
- *      Author: jacob
+ * @addtogroup ZYNQ7000_GIC
+ * @{
  */
 
 #include "gic.h"
@@ -10,15 +27,29 @@
 #include <string.h>
 #include "hal.h"
 
+/**
+ * @brief   Macro for IRQ ID verification
+ */
 #define IRQ_ID_CHECK(id) osalDbgAssert(id < IRQ_ID__COUNT, "invalid IRQ ID")
 
+/**
+ * @brief   Element in the IRQ handler table
+ */
 typedef struct {
   irq_handler_t handler;
   void *context;
 } irq_handler_table_entry_t;
 
+/**
+ * @brief   Table of IRQ handlers
+ */
 static irq_handler_table_entry_t irq_handler_table[IRQ_ID__COUNT];
 
+/**
+ * @brief   Initializes the GIC
+ *
+ * @notapi
+ */
 void gic_init(void)
 {
   /* Configure CPU interface */
@@ -36,6 +67,13 @@ void gic_init(void)
   memset(irq_handler_table, 0, sizeof(irq_handler_table));
 }
 
+/**
+ * @brief   Handles a CPU IRQ
+ * @details This function should be called from the IRQ vector to handle
+ *          and distribute the pending interrupt.
+ *
+ * @notapi
+ */
 void gic_handle_irq(void)
 {
   /* Read pending interrupt ID */
@@ -54,6 +92,16 @@ void gic_handle_irq(void)
   GIC_ICC->ICCEOIR = int_id_full;
 }
 
+/**
+ * @brief   Installs an IRQ handler
+ * @details Sets a vector for an interrupt source and enables it.
+ *
+ * @param[in] irq_id    the IRQ number
+ * @param[in] handler   the pointer to the IRQ handler
+ * @param[in] context   the data to be passed to the IRQ handler
+ *
+ * @api
+ */
 void gic_handler_register(irq_id_t irq_id, irq_handler_t handler,
                           void *context)
 {
@@ -68,6 +116,15 @@ void gic_handler_register(irq_id_t irq_id, irq_handler_t handler,
   GIC_ICD->ICDIPTR[irq_id] |= (1 << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu_id));
 }
 
+/**
+ * @brief   Sets the priority level for an IRQ
+ * @note    Lower priority values correspond to higher logical priority.
+ *
+ * @param[in] irq_id    the IRQ number
+ * @param[in] priority  the priority level [0, 30]
+ *
+ * @api
+ */
 void gic_irq_priority_set(irq_id_t irq_id, irq_priority_t priority)
 {
   IRQ_ID_CHECK(irq_id);
@@ -77,6 +134,16 @@ void gic_irq_priority_set(irq_id_t irq_id, irq_priority_t priority)
   GIC_ICD->ICDIPR[irq_id] = (priority << GIC_ICD_ICDIPR_PRIORITY_Pos);
 }
 
+/**
+ * @brief   Sets the internal sensitivity for an IRQ
+ * @note    Sensitivities are often fixed for specific IRQs. See product
+ *          datasheet for specifics.
+ *
+ * @param[in] irq_id        the IRQ number
+ * @param[in] sensitivity   the sensitivity to configure
+ *
+ * @api
+ */
 void gic_irq_sensitivity_set(irq_id_t irq_id, irq_sensitivity_t sensitivity)
 {
   IRQ_ID_CHECK(irq_id);
@@ -99,6 +166,13 @@ void gic_irq_sensitivity_set(irq_id_t irq_id, irq_sensitivity_t sensitivity)
   }
 }
 
+/**
+ * @brief   Enables handling of an IRQ
+ *
+ * @param[in] irq_id        the IRQ number
+ *
+ * @api
+ */
 void gic_irq_enable(irq_id_t irq_id)
 {
   IRQ_ID_CHECK(irq_id);
@@ -107,6 +181,13 @@ void gic_irq_enable(irq_id_t irq_id)
       GIC_ICD_ICDISER_SET_Msk(irq_id);
 }
 
+/**
+ * @brief   Disables handling of an IRQ
+ *
+ * @param[in] irq_id        the IRQ number
+ *
+ * @api
+ */
 void gic_irq_disable(irq_id_t irq_id)
 {
   IRQ_ID_CHECK(irq_id);
@@ -115,6 +196,13 @@ void gic_irq_disable(irq_id_t irq_id)
       GIC_ICD_ICDICER_CLEAR_Msk(irq_id);
 }
 
+/**
+ * @brief   Sets an IRQ pending
+ *
+ * @param[in] irq_id        the IRQ number
+ *
+ * @api
+ */
 void gic_irq_pending_set(irq_id_t irq_id)
 {
   IRQ_ID_CHECK(irq_id);
@@ -123,6 +211,13 @@ void gic_irq_pending_set(irq_id_t irq_id)
       GIC_ICD_ICDISPR_SET_Msk(irq_id);
 }
 
+/**
+ * @brief   Clears a pending IRQ
+ *
+ * @param[in] irq_id        the IRQ number
+ *
+ * @api
+ */
 void gic_irq_pending_clear(irq_id_t irq_id)
 {
   IRQ_ID_CHECK(irq_id);
