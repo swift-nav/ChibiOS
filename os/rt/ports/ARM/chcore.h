@@ -236,6 +236,15 @@ struct context {
 /*===========================================================================*/
 
 /**
+ * @brief   FPU-specific context initialization
+ */
+#if defined(ARM_FPU)
+#define ARM_FPU_SETUP_CONTEXT(tp) { (tp)->p_ctx.r13->fpscr = (regarm_t)(0); }
+#else
+#define ARM_FPU_SETUP_CONTEXT(tp)
+#endif
+
+/**
  * @brief   Platform dependent part of the @p chThdCreateI() API.
  * @details This code usually setup the context switching frame represented
  *          by an @p port_intctx structure.
@@ -247,6 +256,7 @@ struct context {
   (tp)->p_ctx.r13->r4 = (regarm_t)(pf);                                     \
   (tp)->p_ctx.r13->r5 = (regarm_t)(arg);                                    \
   (tp)->p_ctx.r13->lr = (regarm_t)(_port_thread_start);                     \
+  ARM_FPU_SETUP_CONTEXT(tp);                                                \
 }
 
 /**
