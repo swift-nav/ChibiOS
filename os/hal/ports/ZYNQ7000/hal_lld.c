@@ -69,6 +69,15 @@ static OSAL_IRQ_HANDLER(irq_handler) {
  */
 void hal_lld_init(void) {
 
+  /* Write vector table address to VBAR */
+  extern void _start(void);
+  asm volatile (
+      "mcr p15, 0, %0, c12, c0, 0"
+      :
+      : "r" (_start)
+      :
+  );
+
   gic_init();
 }
 
@@ -87,21 +96,6 @@ uint8_t hal_lld_cpu_id_get(void) {
       :
   );
   return cpu_id;
-}
-
-/* Early init hook */
-void __early_init(void) {
-
-  /* Write vector table address to VBAR */
-  extern void _start(void);
-  asm volatile (
-      "mcr p15, 0, %0, c12, c0, 0"
-      :
-      : "r" (_start)
-      :
-  );
-
-  /* TODO: Set up caches, MMU, SCU */
 }
 
 /** @} */
