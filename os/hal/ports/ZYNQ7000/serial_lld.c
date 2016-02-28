@@ -129,6 +129,8 @@ static void error_set(SerialDriver *sdp, uint32_t isr) {
 static void baud_calc(uint32_t baudrate, uint32_t *rbd, uint32_t *rcd) {
   uint32_t ref_clk = ZYNQ7000_SERIAL_UART_REFCLK_FREQUENCY_Hz;
   uint32_t best_error = UINT32_MAX;
+  uint32_t best_bd = 0;
+  uint32_t best_cd = 0;
 
   uint32_t bd;
   for (bd = BD_MIN; bd <= BD_MAX; bd++) {
@@ -141,14 +143,17 @@ static void baud_calc(uint32_t baudrate, uint32_t *rbd, uint32_t *rcd) {
       cd = CD_MAX;
 
     uint32_t baudrate_actual = ref_clk / ((bd + 1) * cd);
-    uint32_t error = ABS(baudrate - baudrate_actual);
-
+    uint32_t error = baudrate > baudrate_actual ? (baudrate - baudrate_actual) :
+                                                  (baudrate_actual - baudrate);
     if (error < best_error) {
-      *rbd = bd;
-      *rcd = cd;
+      best_bd = bd;
+      best_cd = cd;
       best_error = error;
     }
   }
+
+  *rbd = best_bd;
+  *rcd = best_cd;
 }
 
 /**
