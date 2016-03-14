@@ -119,53 +119,15 @@ void _pal_lld_setgroupmode(ioportid_t port,
                            ioportmask_t mask,
                            iomode_t mode) {
 
-  uint32_t function = (mode & 0xffff);
-  bool output = (mode & PAL_DIR_OUTPUT);
-  bool pullup = (mode & PAL_PULL_UP);
-  bool fast = (mode & PAL_SPEED_FAST);
-  bool mio = (port == GPIO0) || (port == GPIO1);
-
-  if (function == PAL_PIN_FUNCTION_GPIO) {
-    if (output) {
-      /* Set DIRM and OEN bits */
-      GPIO->CFG[port].DIRM |= mask;
-      GPIO->CFG[port].OEN |= mask;
-    } else {
-      /* Clear DIRM and OEN bits */
-      GPIO->CFG[port].DIRM &= ~mask;
-      GPIO->CFG[port].OEN &= ~mask;
-    }
-  }
-
-  uint32_t clear_mask = (GPIO_MIO_PIN_PULLUP_Msk |
-                         GPIO_MIO_PIN_SPEED_Msk |
-                         GPIO_MIO_PIN_L3_SEL_Msk |
-                         GPIO_MIO_PIN_L2_SEL_Msk |
-                         GPIO_MIO_PIN_L1_SEL_Msk |
-                         GPIO_MIO_PIN_L0_SEL_Msk |
-                         GPIO_MIO_PIN_TRI_ENABLE_Msk);
-
-  uint32_t set_mask = (function << GPIO_MIO_PIN_L0_SEL_Pos);
-  if (!output)
-    set_mask |= GPIO_MIO_PIN_TRI_ENABLE_Msk;
-  if (fast)
-    set_mask |= GPIO_MIO_PIN_SPEED_Msk;
-  if (pullup)
-    set_mask |= GPIO_MIO_PIN_PULLUP_Msk;
-
-  if (mio) {
-    uint32_t mio_pin_number = port * PAL_IOPORTS_WIDTH;
-    do {
-      if (mask & 1) {
-        uint32_t mio_pin_reg = GPIO_MIO->MIO_PIN[mio_pin_number];
-        mio_pin_reg &= ~clear_mask;
-        mio_pin_reg |= set_mask;
-        GPIO_MIO->MIO_PIN[mio_pin_number] = mio_pin_reg;
-      }
-
-      mio_pin_number++;
-      mask >>= 1;
-    } while (mask);
+  bool output = (mode == PAL_MODE_OUTPUT);
+  if (output) {
+    /* Set DIRM and OEN bits */
+    GPIO->CFG[port].DIRM |= mask;
+    GPIO->CFG[port].OEN |= mask;
+  } else {
+    /* Clear DIRM and OEN bits */
+    GPIO->CFG[port].DIRM &= ~mask;
+    GPIO->CFG[port].OEN &= ~mask;
   }
 }
 

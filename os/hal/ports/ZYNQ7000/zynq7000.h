@@ -45,9 +45,6 @@
 #define GPIO_BASE 0xE000A000U
 #define GPIO ((gpio_t *)GPIO_BASE)
 
-#define GPIO_MIO_BASE 0xF8000700U
-#define GPIO_MIO ((gpio_mio_t *)GPIO_MIO_BASE)
-
 #define UART0_BASE 0xE0000000U
 #define UART0 ((uart_t *)UART0_BASE)
 
