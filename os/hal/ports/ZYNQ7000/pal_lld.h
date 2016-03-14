@@ -43,46 +43,8 @@
 #undef PAL_MODE_OUTPUT_OPENDRAIN
 
 /* Direction */
-#define PAL_DIR_INPUT                 (0U)
-#define PAL_DIR_OUTPUT                (1U << 16U)
-#define PAL_DIR_PERICTRL              (PAL_DIR_OUTPUT)
-
-/* Pull */
-#define PAL_PULL_NONE                 (0U)
-#define PAL_PULL_UP                   (1U << 17U)
-
-/* Speed */
-#define PAL_SPEED_SLOW                (0U)
-#define PAL_SPEED_FAST                (1U << 18U)
-
-/* Pin Function */
-#define PAL_PIN_FUNCTION_GPIO         (0U)
-#define PAL_PIN_FUNCTION(n)           (n)
-
-/* Composite Modes */
-#define PAL_MODE_INPUT                (PAL_DIR_INPUT  |                       \
-                                       PAL_PULL_NONE  |                       \
-                                       PAL_SPEED_SLOW |                       \
-                                       PAL_PIN_FUNCTION_GPIO)
-
-#define PAL_MODE_UNCONNECTED          (PAL_MODE_INPUT)
-#define PAL_MODE_RESET                (PAL_MODE_INPUT)
-
-#define PAL_MODE_INPUT_PULLUP         (PAL_DIR_INPUT  |                       \
-                                       PAL_PULL_UP    |                       \
-                                       PAL_SPEED_SLOW |                       \
-                                       PAL_PIN_FUNCTION_GPIO)
-
-#define PAL_MODE_OUTPUT_PUSHPULL      (PAL_DIR_OUTPUT |                       \
-                                       PAL_PULL_NONE  |                       \
-                                       PAL_SPEED_SLOW |                       \
-                                       PAL_PIN_FUNCTION_GPIO)
-
-#define PAL_MODE_CUSTOM(dir, pull, speed, func)                               \
-                                      ((dir)          |                       \
-                                       (pull)         |                       \
-                                       (speed)        |                       \
-                                       (func))
+#define PAL_MODE_INPUT                (0U)
+#define PAL_MODE_OUTPUT               (1U)
 
 /*===========================================================================*/
 /* I/O Ports Types and constants.                                            */
