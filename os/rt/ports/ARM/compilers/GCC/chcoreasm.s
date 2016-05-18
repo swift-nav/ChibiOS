@@ -181,6 +181,9 @@ _port_switch_arm:
                 .code   32
                 .global Irq_Handler
 Irq_Handler:
+
+                // Push caller-saved registers to System stack
+                msr     CPSR_c, #MODE_SYS | I_BIT
                 stmfd   sp!, {r0-r3, r12, lr}
 
 #if defined(ARM_FPU)
@@ -190,6 +193,15 @@ Irq_Handler:
                 push    {r0}
 #endif
 
+                // Save the IRQ conditions
+                msr     CPSR_c, #MODE_IRQ | I_BIT
+                mrs     r0, SPSR
+                mov     r1, lr
+                msr     CPSR_c, #MODE_SYS | I_BIT
+                stmfd   sp!, {r0, r1}           // Push R0=SPSR_IRQ, R1=LR_IRQ.
+
+                // Call ISR in IRQ mode
+                msr     CPSR_c, #MODE_IRQ | I_BIT
                 ldr     r0, =ARM_IRQ_VECTOR_REG
                 ldr     r0, [r0]
 #if !defined(THUMB_NO_INTERWORKING)
@@ -205,35 +217,11 @@ _irq_ret_arm:
                 bx      lr
                 .code   32
 #endif /* defined(THUMB_NO_INTERWORKING) */
+                msr     CPSR_c, #MODE_SYS | I_BIT
+
+                // Skip context switch if ISR returns false
                 cmp     r0, #0
-
-#if defined(ARM_FPU)
-                pop     {r0}
-                vpop    {d0-d7}
-                vpop    {d16-d31}
-                fmxr    fpscr, r0
-#endif
-
-                ldmfd   sp!, {r0-r3, r12, lr}
-                subeqs  pc, lr, #4              // No reschedule, returns.
-
-                // Now the frame is created in the system stack, the IRQ
-                // stack is empty.
-                msr     CPSR_c, #MODE_SYS | I_BIT
-                stmfd   sp!, {r0-r3, r12, lr}
-
-#if defined(ARM_FPU)
-                fmrx    r0, fpscr
-                vpush   {d16-d31}
-                vpush   {d0-d7}
-                push    {r0}
-#endif
-
-                msr     CPSR_c, #MODE_IRQ | I_BIT
-                mrs     r0, SPSR
-                mov     r1, lr
-                msr     CPSR_c, #MODE_SYS | I_BIT
-                stmfd   sp!, {r0, r1}           // Push R0=SPSR, R1=LR_IRQ.
+                beq     _irq_handler_done
 
                 // Context switch.
 #if defined(THUMB_NO_INTERWORKING)
@@ -260,13 +248,15 @@ _irq_ret_arm:
 #endif
 #endif /* !defined(THUMB_NO_INTERWORKING) */
 
-                // Re-establish the IRQ conditions again.
-                ldmfd   sp!, {r0, r1}           // Pop R0=SPSR, R1=LR_IRQ.
+_irq_handler_done:
+                // Re-establish the IRQ conditions
+                ldmfd   sp!, {r0, r1}           // Pop R0=SPSR_IRQ, R1=LR_IRQ.
                 msr     CPSR_c, #MODE_IRQ | I_BIT
                 msr     SPSR_fsxc, r0
                 mov     lr, r1
                 msr     CPSR_c, #MODE_SYS | I_BIT
 
+                // Pop caller-saved registers from System stack
 #if defined(ARM_FPU)
                 pop     {r0}
                 vpop    {d0-d7}
