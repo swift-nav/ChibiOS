@@ -192,6 +192,10 @@ typedef void *regarm_t;
 struct port_extctx {
   regarm_t              spsr_irq;
   regarm_t              lr_irq;
+#if defined(ARM_FPU)
+  regarm_t              fpscr;
+  regarm_t              d[48]; // d0-d7, d16-d31
+#endif
   regarm_t              r0;
   regarm_t              r1;
   regarm_t              r2;
@@ -207,8 +211,7 @@ struct port_extctx {
  */
 struct port_intctx {
 #if defined(ARM_FPU)
-  regarm_t              fpscr;
-  regarm_t              d[64];
+  regarm_t              d[16]; // d8-d15
 #endif
   regarm_t              r4;
   regarm_t              r5;
@@ -236,15 +239,6 @@ struct context {
 /*===========================================================================*/
 
 /**
- * @brief   FPU-specific context initialization
- */
-#if defined(ARM_FPU)
-#define ARM_FPU_SETUP_CONTEXT(tp) { (tp)->p_ctx.r13->fpscr = (regarm_t)(0); }
-#else
-#define ARM_FPU_SETUP_CONTEXT(tp)
-#endif
-
-/**
  * @brief   Platform dependent part of the @p chThdCreateI() API.
  * @details This code usually setup the context switching frame represented
  *          by an @p port_intctx structure.
@@ -256,7 +250,6 @@ struct context {
   (tp)->p_ctx.r13->r4 = (regarm_t)(pf);                                     \
   (tp)->p_ctx.r13->r5 = (regarm_t)(arg);                                    \
   (tp)->p_ctx.r13->lr = (regarm_t)(_port_thread_start);                     \
-  ARM_FPU_SETUP_CONTEXT(tp);                                                \
 }
 
 /**

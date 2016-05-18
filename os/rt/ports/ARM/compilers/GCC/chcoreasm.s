@@ -46,7 +46,7 @@
                 .equ    F_BIT, 0x40
 
 #if defined(ARM_FPU)
-				.fpu	ARM_FPU
+                .fpu    ARM_FPU
 #endif
 
                 .text
@@ -132,19 +132,13 @@ _port_switch_arm:
                 stmfd   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, lr}
 
 #if defined(ARM_FPU)
-				fmrx    r4, fpscr
-				vpush   {d0-d15}
-				vpush   {d16-d31}
-				push    {r4}
+                vpush   {d8-d15}
 #endif
                 str     sp, [r1, #12]
                 ldr     sp, [r0, #12]
 
 #if defined(ARM_FPU)
-                pop     {r4}
-				vpop    {d16-d31}
-				vpop    {d0-d15}
-				fmxr    fpscr, r4
+                vpop    {d8-d15}
 #endif
 
 #if defined(THUMB_PRESENT)
@@ -190,10 +184,10 @@ Irq_Handler:
                 stmfd   sp!, {r0-r3, r12, lr}
 
 #if defined(ARM_FPU)
-				fmrx    r0, fpscr
-				vpush   {d0-d7}
-				vpush   {d16-d31}
-				push    {r0}
+                fmrx    r0, fpscr
+                vpush   {d16-d31}
+                vpush   {d0-d7}
+                push    {r0}
 #endif
 
                 ldr     r0, =ARM_IRQ_VECTOR_REG
@@ -215,9 +209,9 @@ _irq_ret_arm:
 
 #if defined(ARM_FPU)
                 pop     {r0}
-				vpop    {d16-d31}
-				vpop    {d0-d7}
-				fmxr    fpscr, r0
+                vpop    {d0-d7}
+                vpop    {d16-d31}
+                fmxr    fpscr, r0
 #endif
 
                 ldmfd   sp!, {r0-r3, r12, lr}
@@ -227,14 +221,19 @@ _irq_ret_arm:
                 // stack is empty.
                 msr     CPSR_c, #MODE_SYS | I_BIT
                 stmfd   sp!, {r0-r3, r12, lr}
+
+#if defined(ARM_FPU)
+                fmrx    r0, fpscr
+                vpush   {d16-d31}
+                vpush   {d0-d7}
+                push    {r0}
+#endif
+
                 msr     CPSR_c, #MODE_IRQ | I_BIT
                 mrs     r0, SPSR
                 mov     r1, lr
                 msr     CPSR_c, #MODE_SYS | I_BIT
                 stmfd   sp!, {r0, r1}           // Push R0=SPSR, R1=LR_IRQ.
-
-                // FPU registers are not saved as it is assumed that
-                // chSchDoReschedule() does not use them
 
                 // Context switch.
 #if defined(THUMB_NO_INTERWORKING)
@@ -267,6 +266,14 @@ _irq_ret_arm:
                 msr     SPSR_fsxc, r0
                 mov     lr, r1
                 msr     CPSR_c, #MODE_SYS | I_BIT
+
+#if defined(ARM_FPU)
+                pop     {r0}
+                vpop    {d0-d7}
+                vpop    {d16-d31}
+                fmxr    fpscr, r0
+#endif
+
                 ldmfd   sp!, {r0-r3, r12, lr}
                 msr     CPSR_c, #MODE_IRQ | I_BIT
                 subs    pc, lr, #4
