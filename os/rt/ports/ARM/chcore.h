@@ -193,6 +193,7 @@ struct port_extctx {
   regarm_t              spsr_irq;
   regarm_t              lr_irq;
 #if defined(ARM_FPU)
+  regarm_t              reserved;
   regarm_t              fpscr;
   regarm_t              d[48]; // d0-d7, d16-d31
 #endif
@@ -212,6 +213,7 @@ struct port_extctx {
 struct port_intctx {
 #if defined(ARM_FPU)
   regarm_t              d[16]; // d8-d15
+  regarm_t              reserved;
 #endif
   regarm_t              r4;
   regarm_t              r5;
@@ -325,7 +327,7 @@ struct context {
 #define port_switch(ntp, otp) {                                             \
   register struct port_intctx *r13 asm ("r13");                             \
   if ((stkalign_t *)(r13 - 1) < otp->p_stklimit)                            \
-  chSysHalt("stack overflow");                                              \
+    chSysHalt("stack overflow");                                            \
   _port_switch_arm(ntp, otp);                                               \
 }
 #else

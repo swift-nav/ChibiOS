@@ -132,6 +132,7 @@ _port_switch_arm:
                 stmfd   sp!, {r4, r5, r6, r7, r8, r9, r10, r11, lr}
 
 #if defined(ARM_FPU)
+                stmfd   sp!, {r4}               // Push R4=RESERVED.
                 vpush   {d8-d15}
 #endif
                 str     sp, [r1, #12]
@@ -139,6 +140,7 @@ _port_switch_arm:
 
 #if defined(ARM_FPU)
                 vpop    {d8-d15}
+                ldmfd   sp!, {r4}               // Pop R4=RESERVED.
 #endif
 
 #if defined(THUMB_PRESENT)
@@ -187,10 +189,10 @@ Irq_Handler:
                 stmfd   sp!, {r0-r3, r12, lr}
 
 #if defined(ARM_FPU)
-                fmrx    r0, fpscr
+                fmrx    r1, fpscr
                 vpush   {d16-d31}
                 vpush   {d0-d7}
-                push    {r0}
+                stmfd   sp!, {r0, r1}           // Push R0=RESERVED, R1=FPSCR.
 #endif
 
                 // Save the IRQ conditions
@@ -258,10 +260,10 @@ _irq_handler_done:
 
                 // Pop caller-saved registers from System stack
 #if defined(ARM_FPU)
-                pop     {r0}
+                ldmfd   sp!, {r0, r1}           // Pop R0=RESERVED, R1=FPSCR.
                 vpop    {d0-d7}
                 vpop    {d16-d31}
-                fmxr    fpscr, r0
+                fmxr    fpscr, r1
 #endif
 
                 ldmfd   sp!, {r0-r3, r12, lr}
