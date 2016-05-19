@@ -22,6 +22,20 @@
  * @{
  */
 
+ /**
+ * @brief   Stack segments initialization switch.
+ */
+#if !defined(CRT0_STACKS_FILL_PATTERN) || defined(__DOXYGEN__)
+#define CRT0_STACKS_FILL_PATTERN            0x55555555
+#endif
+
+/**
+ * @brief   Stack segments initialization switch.
+ */
+#if !defined(CRT0_INIT_STACKS) || defined(__DOXYGEN__)
+#define CRT0_INIT_STACKS                    TRUE
+#endif
+
 #if !defined(__DOXYGEN__)
 
                 .set    MODE_USR, 0x10
@@ -92,6 +106,20 @@ Reset_Handler:
                 bx      r0
                 .code   32
 #endif /* defined(THUMB_NO_INTERWORKING) */
+
+#if CRT0_INIT_STACKS == TRUE
+                ldr     r0, =CRT0_STACKS_FILL_PATTERN
+                /* Stack initialization. Note, it assumes that the
+                   stack size is a multiple of 4 so the linker file must
+                   ensure this.*/
+                ldr     r1, =__stacks_base__
+                ldr     r2, =__stacks_end__
+msloop:
+                cmp     r1, r2
+                itt     lo
+                strlo   r0, [r1], #4
+                blo     msloop
+#endif
 
                 /*
                  * Data initialization.
