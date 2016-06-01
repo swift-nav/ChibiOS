@@ -332,14 +332,15 @@ int chprintf(BaseSequentialStream *chp, const char *fmt, ...) {
  * @param[in] str       pointer to a buffer
  * @param[in] size      maximum size of the buffer
  * @param[in] fmt       formatting string
+ * @param[in] ap        list of parameters
  * @return              The number of characters (excluding the
  *                      terminating NUL byte) that would have been
  *                      stored in @p str if there was room.
  *
  * @api
  */
-int chsnprintf(char *str, size_t size, const char *fmt, ...) {
-  va_list ap;
+
+int chvsnprintf(char *str, size_t size, const char *fmt, va_list ap) {
   MemoryStream ms;
   BaseSequentialStream *chp;
   size_t size_wo_nul;
@@ -356,9 +357,7 @@ int chsnprintf(char *str, size_t size, const char *fmt, ...) {
 
   /* Performing the print operation using the common code.*/
   chp = (BaseSequentialStream *)(void *)&ms;
-  va_start(ap, fmt);
   retval = chvprintf(chp, fmt, ap);
-  va_end(ap);
 
   /* Terminate with a zero, unless size==0.*/
   if (ms.eos < size)
@@ -366,6 +365,46 @@ int chsnprintf(char *str, size_t size, const char *fmt, ...) {
 
   /* Return number of bytes that would have been written.*/
   return retval;
+}
+
+/**
+ * @brief   System formatted output function.
+ * @details This function implements a minimal @p vprintf()-like functionality
+ *          with output on a @p BaseSequentialStream.
+ *          The general parameters format is: %[-][width|*][.precision|*][l|L]p.
+ *          The following parameter types (p) are supported:
+ *          - <b>x</b> hexadecimal integer.
+ *          - <b>X</b> hexadecimal long.
+ *          - <b>o</b> octal integer.
+ *          - <b>O</b> octal long.
+ *          - <b>d</b> decimal signed integer.
+ *          - <b>D</b> decimal signed long.
+ *          - <b>u</b> decimal unsigned integer.
+ *          - <b>U</b> decimal unsigned long.
+ *          - <b>c</b> character.
+ *          - <b>s</b> string.
+ *          .
+ * @post    @p str is NUL-terminated, unless @p size is 0.
+ *
+ * @param[in] str       pointer to a buffer
+ * @param[in] size      maximum size of the buffer
+ * @param[in] fmt       formatting string
+ * @return              The number of characters (excluding the
+ *                      terminating NUL byte) that would have been
+ *                      stored in @p str if there was room.
+ *
+ * @api
+ */
+
+int chsnprintf(char *str, size_t size, const char *fmt, ...) {
+  va_list ap;
+  int formatted_bytes;
+
+  va_start(ap, fmt);
+  formatted_bytes = chvsnprintf(str, size, fmt, ap);
+  va_end(ap);
+
+  return formatted_bytes;
 }
 
 /** @} */
