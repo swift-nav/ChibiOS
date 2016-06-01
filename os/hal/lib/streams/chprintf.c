@@ -87,7 +87,7 @@ static char *ftoa(char *p, double num, unsigned long precision) {
   l = (long)num;
   p = long_to_string_with_divisor(p, l, 10, 0);
   *p++ = '.';
-  l = (long)((num - l) * precision);
+  l = (long)(((num - l) * precision) + 0.5);
   return long_to_string_with_divisor(p, l, 10, precision / 10);
 }
 #endif
