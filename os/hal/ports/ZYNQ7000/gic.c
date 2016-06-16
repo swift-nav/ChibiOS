@@ -30,7 +30,12 @@
 /**
  * @brief   Macro for IRQ ID verification
  */
-#define IRQ_ID_CHECK(id) osalDbgAssert(id < IRQ_ID__COUNT, "invalid IRQ ID")
+#define IRQ_ID_CHECK(id) osalDbgAssert((id) < IRQ_ID__COUNT, "invalid IRQ ID")
+
+/**
+ * @brief   Macro to check if an IRQ ID is banked per CPU
+ */
+#define IRQ_ID_BANKED(id) (((id) < 32) ? TRUE : FALSE)
 
 /**
  * @brief   Element in the IRQ handler table
@@ -60,11 +65,13 @@ void gic_init(void)
   /* Set priority mask */
   GIC_ICC->ICCPMR = 0xFF;
 
-  /* Enable distributor */
-  GIC_ICD->ICDDCR = (1 << GIC_ICD_ICDDCR_ENABLE_Pos);
-
   /* Clear handler table */
   memset(irq_handler_table, 0, sizeof(irq_handler_table));
+
+#if ZYNQ7000_GIC_ICD_MASTER == TRUE
+  /* Enable distributor */
+  GIC_ICD->ICDDCR = (1 << GIC_ICD_ICDDCR_ENABLE_Pos);
+#endif
 }
 
 /**
@@ -111,9 +118,12 @@ void gic_handler_register(irq_id_t irq_id, irq_handler_t handler,
   irq_handler_table[irq_id].handler = handler;
   irq_handler_table[irq_id].context = context;
 
-  /* Target this CPU */
-  uint8_t cpu_id = hal_lld_cpu_id_get();
-  GIC_ICD->ICDIPTR[irq_id] |= (1 << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu_id));
+  if ((ZYNQ7000_GIC_ICD_MASTER == TRUE) ||
+      IRQ_ID_BANKED(irq_id)) {
+    /* Target this CPU */
+    uint8_t cpu_id = hal_lld_cpu_id_get();
+    GIC_ICD->ICDIPTR[irq_id] |= (1 << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu_id));
+  }
 }
 
 /**
@@ -148,21 +158,24 @@ void gic_irq_sensitivity_set(irq_id_t irq_id, irq_sensitivity_t sensitivity)
 {
   IRQ_ID_CHECK(irq_id);
 
-  switch (sensitivity) {
-  case IRQ_SENSITIVITY_EDGE: {
-    GIC_ICD->ICDICR[GIC_ICD_ICDICR_EDGETRIG_Reg(irq_id)] |=
-        GIC_ICD_ICDICR_EDGETRIG_Msk(irq_id);
-  }
-  break;
+  if ((ZYNQ7000_GIC_ICD_MASTER == TRUE) ||
+      IRQ_ID_BANKED(irq_id)) {
+    switch (sensitivity) {
+    case IRQ_SENSITIVITY_EDGE: {
+      GIC_ICD->ICDICR[GIC_ICD_ICDICR_EDGETRIG_Reg(irq_id)] |=
+          GIC_ICD_ICDICR_EDGETRIG_Msk(irq_id);
+    }
+    break;
 
-  case IRQ_SENSITIVITY_LEVEL: {
-    GIC_ICD->ICDICR[GIC_ICD_ICDICR_EDGETRIG_Reg(irq_id)] &=
-        ~GIC_ICD_ICDICR_EDGETRIG_Msk(irq_id);
-  }
-  break;
+    case IRQ_SENSITIVITY_LEVEL: {
+      GIC_ICD->ICDICR[GIC_ICD_ICDICR_EDGETRIG_Reg(irq_id)] &=
+          ~GIC_ICD_ICDICR_EDGETRIG_Msk(irq_id);
+    }
+    break;
 
-  default:
-    osalDbgAssert(0, "invalid irq sensitivity");
+    default:
+      osalDbgAssert(0, "invalid irq sensitivity");
+    }
   }
 }
 

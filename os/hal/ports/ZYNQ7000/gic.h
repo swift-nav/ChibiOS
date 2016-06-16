@@ -26,6 +26,16 @@
 #define _GIC_H_
 
 #include "zynq7000.h"
+#include "halconf.h"
+
+/**
+ * @brief   GIC distributor master - slave configuration.
+ * @details If set to @p TRUE shared GIC distributor registers are configured.
+ * @note    The default is @p TRUE.
+ */
+#if !defined(ZYNQ7000_GIC_ICD_MASTER) || defined(__DOXYGEN__)
+#define ZYNQ7000_GIC_ICD_MASTER               TRUE
+#endif
 
 /**
  * @brief   IRQ priority type
