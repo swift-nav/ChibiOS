@@ -114,15 +114,17 @@ void gic_handler_register(irq_id_t irq_id, irq_handler_t handler,
 {
   IRQ_ID_CHECK(irq_id);
 
-  /* Add to table */
-  irq_handler_table[irq_id].handler = handler;
-  irq_handler_table[irq_id].context = context;
+  if (irq_id < IRQ_ID__COUNT) {
+    /* Add to table */
+    irq_handler_table[irq_id].handler = handler;
+    irq_handler_table[irq_id].context = context;
 
-  if ((ZYNQ7000_GIC_ICD_MASTER == TRUE) ||
-      IRQ_ID_BANKED(irq_id)) {
-    /* Target this CPU */
-    uint8_t cpu_id = hal_lld_cpu_id_get();
-    GIC_ICD->ICDIPTR[irq_id] |= (1 << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu_id));
+    if ((ZYNQ7000_GIC_ICD_MASTER == TRUE) ||
+        IRQ_ID_BANKED(irq_id)) {
+      /* Target this CPU */
+      uint8_t cpu_id = hal_lld_cpu_id_get();
+      GIC_ICD->ICDIPTR[irq_id] |= (1 << GIC_ICD_ICDIPTR_CPUTARGETn_Pos(cpu_id));
+    }
   }
 }
 
