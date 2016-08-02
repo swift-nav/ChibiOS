@@ -44,8 +44,8 @@
  * @details If set to @p TRUE the support for I2C1 is included.
  * @note    The default is @p FALSE.
  */
-#if !defined(PLATFORM_I2C_USE_I2C1) || defined(__DOXYGEN__)
-#define PLATFORM_I2C_USE_I2C1                  FALSE
+#if !defined(ZYNQ7000_I2C_USE_I2C1) || defined(__DOXYGEN__)
+#define ZYNQ7000_I2C_USE_I2C1                  FALSE
 #endif
 /** @} */
 
@@ -156,7 +156,7 @@ struct I2CDriver {
 /* External declarations.                                                    */
 /*===========================================================================*/
 
-#if (PLATFORM_I2C_USE_I2C1 == TRUE) && !defined(__DOXYGEN__)
+#if (ZYNQ7000_I2C_USE_I2C1 == TRUE) && !defined(__DOXYGEN__)
 extern I2CDriver I2CD1;
 #endif
 
