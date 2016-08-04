@@ -100,7 +100,7 @@ SECTIONS
     {
         *(.eh_frame)
     } > flash
-    
+
     .textalign : ONLY_IF_RO
     {
         . = ALIGN(8);
@@ -109,15 +109,6 @@ SECTIONS
     . = ALIGN(4);
     _etext = .;
     _textdata = _etext;
-
-    .stacks :
-    {
-        . = ALIGN(8);
-        __stacks_base__ = .;
-        . += __stacks_total_size__;
-        . = ALIGN(8);
-        __stacks_end__ = .;
-    } > STACKS_RAM
 
     .data : ALIGN(4)
     {
@@ -140,7 +131,16 @@ SECTIONS
         . = ALIGN(4);
         PROVIDE(_bss_end = .);
         PROVIDE(end = .);
-    } > BSS_RAM    
+    } > BSS_RAM
+
+    .stacks :
+    {
+        . = ALIGN(8);
+        __stacks_base__ = .;
+        . += __stacks_total_size__;
+        . = ALIGN(8);
+        __stacks_end__ = .;
+    } > STACKS_RAM
 
     .ram0 (NOLOAD) : ALIGN(4)
     {
