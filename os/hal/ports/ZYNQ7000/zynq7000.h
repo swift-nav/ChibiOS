@@ -23,6 +23,7 @@
 
 #include "zynq7000_gic.h"
 #include "zynq7000_gpio.h"
+#include "zynq7000_i2c.h"
 #include "zynq7000_prv_timer.h"
 #include "zynq7000_prv_wdt.h"
 #include "zynq7000_spi.h"
@@ -56,6 +57,12 @@
 
 #define SPI1_BASE 0xE0007000U
 #define SPI1 ((spi_t *)SPI1_BASE)
+
+#define I2C0_BASE 0xE0004000U
+#define I2C0 ((i2c_t *)I2C0_BASE)
+
+#define I2C1_BASE 0xE0005000U
+#define I2C1 ((i2c_t *)I2C1_BASE)
 
 #define TTC0_BASE 0xF8001000U
 #define TTC0 ((ttc_t *)TTC0_BASE)

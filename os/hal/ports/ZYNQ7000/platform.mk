@@ -7,6 +7,7 @@ PLATFORMSRC = ${CHIBIOS}/os/hal/ports/ZYNQ7000/hal_lld.c \
               ${CHIBIOS}/os/hal/ports/ZYNQ7000/serial_lld.c \
               ${CHIBIOS}/os/hal/ports/ZYNQ7000/spi_lld.c \
               ${CHIBIOS}/os/hal/ports/ZYNQ7000/gpt_lld.c \
+              ${CHIBIOS}/os/hal/ports/ZYNQ7000/i2c_lld.c \
               ${CHIBIOS}/os/hal/ports/ZYNQ7000/gic.c
 
 # Required include directories
