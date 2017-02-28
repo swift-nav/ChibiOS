@@ -178,6 +178,51 @@ typedef uint32_t ioportid_t;
 #define pal_lld_writeport(port, bits) _pal_lld_writeport(port, bits)
 
 /**
+ * @brief   Sets a bits mask on a I/O port.
+ *
+ * @param[in] port      port identifier
+ * @param[in] bits      bits to be ORed on the specified port
+ *
+ * @notapi
+ */
+#define pal_lld_setport(port, bits) _pal_lld_setport(port, bits)
+
+/**
+ * @brief   Clears a bits mask on a I/O port.
+ *
+ * @param[in] port      port identifier
+ * @param[in] bits      bits to be cleared on the specified port
+ *
+ * @notapi
+ */
+#define pal_lld_clearport(port, bits) _pal_lld_clearport(port, bits)
+
+/**
+ * @brief   Toggles a bits mask on a I/O port.
+ *
+ * @param[in] port      port identifier
+ * @param[in] bits      bits to be XORed on the specified port
+ *
+ * @notapi
+ */
+#define pal_lld_toggleport(port, bits) _pal_lld_toggleport(port, bits)
+
+/**
+ * @brief   Writes a group of bits.
+ *
+ * @param[in] port      port identifier
+ * @param[in] mask      group mask, a logic AND is performed on the
+ *                      output data
+ * @param[in] offset    group bit offset within the port
+ * @param[in] bits      bits to be written. Values exceeding the group
+ *                      width are masked.
+ *
+ * @notapi
+ */
+#define pal_lld_writegroup(port, mask, offset, bits)                        \
+  _pal_lld_writegroup(port, mask << offset, bits)
+
+/**
  * @brief   Pads group mode setup.
  * @details This function programs a pads group belonging to the same port
  *          with the specified mode.
@@ -193,6 +238,48 @@ typedef uint32_t ioportid_t;
 #define pal_lld_setgroupmode(port, mask, offset, mode)                      \
   _pal_lld_setgroupmode(port, mask << offset, mode)
 
+/**
+ * @brief   Writes a logic state on an output pad.
+ *
+ * @param[in] port      port identifier
+ * @param[in] pad       pad number within the port
+ * @param[in] bit       logic value, the value must be @p PAL_LOW or
+ *                      @p PAL_HIGH
+ *
+ * @notapi
+ */
+#define pal_lld_writepad(port, pad, bit) _pal_lld_writepad(port, pad, bit)
+
+/**
+ * @brief   Sets a pad logic state to @p PAL_HIGH.
+ *
+ * @param[in] port      port identifier
+ * @param[in] pad       pad number within the port
+ *
+ * @notapi
+ */
+#define pal_lld_setpad(port, pad) _pal_lld_writepad(port, pad, PAL_HIGH)
+
+/**
+ * @brief   Clears a pad logic state to @p PAL_LOW.
+ *
+ * @param[in] port      port identifier
+ * @param[in] pad       pad number within the port
+ *
+ * @notapi
+ */
+#define pal_lld_clearpad(port, pad) _pal_lld_writepad(port, pad, PAL_LOW)
+
+/**
+ * @brief   Toggles a pad logic state.
+ *
+ * @param[in] port      port identifier
+ * @param[in] pad       pad number within the port
+ *
+ * @notapi
+ */
+#define pal_lld_togglepad(port, pad) _pal_lld_togglepad(port, pad)
+
 #if !defined(__DOXYGEN__)
 extern const PALConfig pal_default_config;
 #endif
@@ -204,9 +291,17 @@ extern "C" {
   ioportmask_t _pal_lld_readport(ioportid_t port);
   ioportmask_t _pal_lld_readlatch(ioportid_t port);
   void _pal_lld_writeport(ioportid_t port, ioportmask_t bits);
+  void _pal_lld_setport(ioportid_t port, ioportmask_t bits);
+  void _pal_lld_clearport(ioportid_t port, ioportmask_t bits);
+  void _pal_lld_toggleport(ioportid_t port, ioportmask_t bits);
+  void _pal_lld_writegroup(ioportid_t port,
+                           ioportmask_t mask,
+                           ioportmask_t bits);
   void _pal_lld_setgroupmode(ioportid_t port,
                              ioportmask_t mask,
                              iomode_t mode);
+  void _pal_lld_writepad(ioportid_t port, uint8_t pad, uint8_t bit);
+  void _pal_lld_togglepad(ioportid_t port, uint8_t pad);
 #ifdef __cplusplus
 }
 #endif

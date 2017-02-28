@@ -44,6 +44,19 @@
 /* Driver local functions.                                                   */
 /*===========================================================================*/
 
+static void mask_write(ioportid_t port, ioportmask_t mask, ioportmask_t bits) {
+
+  if (mask & 0xFFFFU) {
+    GPIO->MASK_DATA[port].LSW = ((~(mask & 0xFFFFU) & 0xFFFFU) << 16) |
+                                ((bits & 0xFFFFU)              << 0);
+  }
+
+  if ((mask >> 16) & 0xFFFFU) {
+    GPIO->MASK_DATA[port].MSW = ((~((mask >> 16) & 0xFFFFU) & 0xFFFFU) << 16) |
+                                (((bits >> 16) & 0xFFFFU)              << 0);
+  }
+}
+
 /*===========================================================================*/
 /* Driver interrupt handlers.                                                */
 /*===========================================================================*/
@@ -105,6 +118,59 @@ void _pal_lld_writeport(ioportid_t port, ioportmask_t bits) {
 }
 
 /**
+ * @brief   Sets a bits mask on a I/O port.
+ *
+ * @param[in] port      port identifier
+ * @param[in] bits      bits to be ORed on the specified port
+ *
+ * @notapi
+ */
+void _pal_lld_setport(ioportid_t port, ioportmask_t bits) {
+  mask_write(port, bits, 0xFFFFFFFFU);
+}
+
+/**
+ * @brief   Clears a bits mask on a I/O port.
+ *
+ * @param[in] port      port identifier
+ * @param[in] bits      bits to be cleared on the specified port
+ *
+ * @notapi
+ */
+void _pal_lld_clearport(ioportid_t port, ioportmask_t bits) {
+  mask_write(port, bits, 0x0U);
+}
+
+/**
+ * @brief   Toggles a bits mask on a I/O port.
+ *
+ * @param[in] port      port identifier
+ * @param[in] bits      bits to be XORed on the specified port
+ *
+ * @notapi
+ */
+void _pal_lld_toggleport(ioportid_t port, ioportmask_t bits) {
+  mask_write(port, bits, ~GPIO->DATA[port]);
+}
+
+/**
+ * @brief   Writes a group of bits.
+ *
+ * @param[in] port      port identifier
+ * @param[in] mask      group mask, a logic AND is performed on the
+ *                      output data
+ * @param[in] bits      bits to be written. Values exceeding the group
+ *                      width are masked.
+ *
+ * @notapi
+ */
+void _pal_lld_writegroup(ioportid_t port,
+                         ioportmask_t mask,
+                         ioportmask_t bits) {
+  mask_write(port, mask, bits);
+}
+
+/**
  * @brief   Pads mode setup.
  * @details This function programs a pads group belonging to the same port
  *          with the specified mode.
@@ -127,6 +193,34 @@ void _pal_lld_setgroupmode(ioportid_t port,
     GPIO->CFG[port].DIRM &= ~mask;
     GPIO->CFG[port].OEN &= ~mask;
   }
+}
+
+/**
+ * @brief   Writes a logic state on an output pad.
+ *
+ * @param[in] port      port identifier
+ * @param[in] pad       pad number within the port
+ * @param[in] bit       logic value, the value must be @p PAL_LOW or
+ *                      @p PAL_HIGH
+ *
+ * @notapi
+ */
+void _pal_lld_writepad(ioportid_t port, uint8_t pad, uint8_t bit) {
+    mask_write(port, PAL_PORT_BIT(pad), (bit & 1U) << pad);
+}
+
+/**
+ * @brief   Toggles a pad logic state.
+ *
+ * @param[in] port      port identifier
+ * @param[in] pad       pad number within the port
+ *
+ * @notapi
+ */
+void _pal_lld_togglepad(ioportid_t port, uint8_t pad) {
+
+  uint8_t bit = (GPIO->DATA[port] & GPIO_PIN_Msk(pad)) ? 0 : 1;
+  _pal_lld_writepad(port, pad, bit);
 }
 
 #endif /* HAL_USE_PAL == TRUE */

@@ -106,7 +106,7 @@ typedef enum {
   /* IRQ IDs 36 is reserved */
   IRQ_ID_PMU_CPU0 =           37,
   IRQ_ID_PMU_CPU1 =           38,
-  IRQ_ID_XACD =               39,
+  IRQ_ID_XADC =               39,
   IRQ_ID_DEVC =               40,
   IRQ_ID_SWDT =               41,
   IRQ_ID_TTC0_0 =             42,
