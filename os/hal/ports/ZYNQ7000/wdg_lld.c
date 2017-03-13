@@ -128,7 +128,9 @@ void wdg_lld_start(WDGDriver *wdgp) {
 void wdg_lld_stop(WDGDriver *wdgp) {
 
   (void)wdgp;
-  PRV_WDT->CONTROL &= ~PRV_WDT_CONTROL_ENABLE_Msk;
+  PRV_WDT->DISABLE = PRV_WDT_DISABLE_VAL_1;
+  PRV_WDT->DISABLE = PRV_WDT_DISABLE_VAL_2;
+  PRV_WDT->CONTROL = 0;
 }
 
 /**
