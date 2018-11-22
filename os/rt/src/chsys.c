@@ -185,6 +185,28 @@ void chSysHalt(const char *reason) {
   }
 }
 
+void chSysHaltExtra(const char *thd,
+                    const char *func,
+                    int line,
+                    const char *reason) {
+
+  port_disable();
+
+#if defined(CH_CFG_SYSTEM_HALT_HOOK) || defined(__DOXYGEN__)
+  if (thd == NULL) {
+    thd = "unknown";
+  }
+  CH_CFG_SYSTEM_HALT_HOOK("%s:%s:%d: %s", thd, func, line, reason);
+#endif
+
+  /* Pointing to the passed message.*/
+  ch.dbg.panic_msg = reason;
+
+  /* Harmless infinite loop.*/
+  while (true) {
+  }
+}
+
 /**
  * @brief   System integrity check.
  * @details Performs an integrity check of the important ChibiOS/RT data
