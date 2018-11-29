@@ -28,6 +28,11 @@
 #ifndef _CHDEBUG_H_
 #define _CHDEBUG_H_
 
+/* Two macros ensures any macro passed will
+ * be expanded before being stringified */
+#define STRINGIFY_DETAIL(x) #x
+#define STRINGIFY(x) STRINGIFY_DETAIL(x)
+
 /*===========================================================================*/
 /* Module constants.                                                         */
 /*===========================================================================*/
@@ -164,14 +169,17 @@ typedef struct {
  * @api
  */
 #if !defined(chDbgCheck)
-#define chDbgCheck(c) do {                                                  \
-  /*lint -save -e506 -e774 [2.1, 14.3] Can be a constant by design.*/       \
-  if (CH_DBG_ENABLE_CHECKS != FALSE) {                                      \
-    if (!(c)) {                                                             \
-  /*lint -restore*/                                                         \
-      chSysHalt(__func__);                                                  \
-    }                                                                       \
-  }                                                                         \
+#define chDbgCheck(c) do {                                                     \
+  /*lint -save -e506 -e774 [2.1, 14.3] Can be a constant by design.*/          \
+  if (CH_DBG_ENABLE_CHECKS != FALSE) {                                         \
+    if (!(c)) {                                                                \
+  /*lint -restore*/                                                            \
+      /* Should use chThdGetSelfX(), but chdebug.h is before chthreads.h in */ \
+      /* ch.h, so this is a shortcut to minimize changes..                  */ \
+      chSysHaltExtra(                                                          \
+           ch.rlist.r_current->p_name, __func__, __LINE__, STRINGIFY(c));      \
+    }                                                                          \
+  }                                                                            \
 } while (false)
 #endif /* !defined(chDbgCheck) */
 
@@ -190,14 +198,14 @@ typedef struct {
  * @api
  */
 #if !defined(chDbgAssert)
-#define chDbgAssert(c, r) do {                                              \
-  /*lint -save -e506 -e774 [2.1, 14.3] Can be a constant by design.*/       \
-  if (CH_DBG_ENABLE_ASSERTS != FALSE) {                                     \
-    if (!(c)) {                                                             \
-  /*lint -restore*/                                                         \
-      chSysHalt(__func__);                                                  \
-    }                                                                       \
-  }                                                                         \
+#define chDbgAssert(c, r) do {                                                 \
+  /*lint -save -e506 -e774 [2.1, 14.3] Can be a constant by design.*/          \
+  if (CH_DBG_ENABLE_ASSERTS != FALSE) {                                        \
+    if (!(c)) {                                                                \
+  /*lint -restore*/                                                            \
+      chSysHaltExtra(ch.rlist.r_current->p_name, __func__, __LINE__, r);       \
+    }                                                                          \
+  }                                                                            \
 } while (false)
 #endif /* !defined(chDbgAssert) */
 /** @} */

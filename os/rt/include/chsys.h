@@ -276,6 +276,10 @@ extern "C" {
 #endif
   void chSysInit(void);
   void chSysHalt(const char *reason);
+  void chSysHaltExtra(const char *thd,
+                      const char *function,
+                      int line,
+                      const char *reason);
   bool chSysIntegrityCheckI(unsigned testmask);
   void chSysTimerHandlerI(void);
   syssts_t chSysGetStatusAndLockX(void);
