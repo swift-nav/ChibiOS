@@ -24,12 +24,12 @@ typedef struct {
   struct {
     volatile uint32_t LSW;
     volatile uint32_t MSW;
-  } MASK_DATA[4];
-  volatile uint32_t RESERVED0[8];
-  volatile uint32_t DATA[4];
-  volatile uint32_t RESERVED1[4];
-  volatile uint32_t DATA_RO[4];
-  volatile uint32_t RESERVED2[101];
+  } MASK_DATA[6];
+  volatile uint32_t RESERVED0[4];
+  volatile uint32_t DATA[6];
+  volatile uint32_t RESERVED1[2];
+  volatile uint32_t DATA_RO[6];
+  volatile uint32_t RESERVED2[99];
   struct {
     volatile uint32_t DIRM;
     volatile uint32_t OEN;
@@ -41,7 +41,7 @@ typedef struct {
     volatile uint32_t INT_POLARITY;
     volatile uint32_t INT_ANY;
     volatile uint32_t RESERVED3[7];
-  } CFG[4];
+  } CFG[6];
 } gpio_t;
 
 /* Bitfields */

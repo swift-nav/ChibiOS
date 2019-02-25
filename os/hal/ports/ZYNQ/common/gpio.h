@@ -22,5 +22,7 @@
 #define GPIO1                       (1U)
 #define GPIO2                       (2U)
 #define GPIO3                       (3U)
+#define GPIO4                       (4U)
+#define GPIO5                       (5U)
 
 #endif /* _GPIO_H_ */

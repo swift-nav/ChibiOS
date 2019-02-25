@@ -21,14 +21,14 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include "zynq7000_gic.h"
-#include "zynq7000_gpio.h"
-#include "zynq7000_i2c.h"
+#include "pl390_gic.h"
+#include "zynq_gpio.h"
+#include "zynq_i2c.h"
 #include "zynq7000_prv_timer.h"
 #include "zynq7000_prv_wdt.h"
-#include "zynq7000_spi.h"
-#include "zynq7000_ttc.h"
-#include "zynq7000_uart.h"
+#include "zynq_spi.h"
+#include "zynq_ttc.h"
+#include "zynq_uart.h"
 
 /* Peripherals */
 #define GIC_ICD_BASE 0xF8F01000U
