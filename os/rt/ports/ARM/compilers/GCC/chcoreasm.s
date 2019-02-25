@@ -190,7 +190,9 @@ Irq_Handler:
 
 #if defined(ARM_FPU)
                 fmrx    r1, fpscr
+# if ARM_FPU != vfp3
                 vpush   {d16-d31}
+# endif
                 vpush   {d0-d7}
                 stmfd   sp!, {r0, r1}           // Push R0=RESERVED, R1=FPSCR.
 #endif
@@ -262,7 +264,9 @@ _irq_handler_done:
 #if defined(ARM_FPU)
                 ldmfd   sp!, {r0, r1}           // Pop R0=RESERVED, R1=FPSCR.
                 vpop    {d0-d7}
+# if ARM_FPU != vfp3
                 vpop    {d16-d31}
+# endif
                 fmxr    fpscr, r1
 #endif
 
